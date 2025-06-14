@@ -29,6 +29,26 @@ GET /api/v1/categories                        # カテゴリ一覧
 
 APIキーベース認証（Header: `X-API-Key`）
 
+## microCMS APIスキーマ
+
+### ブログ (endpoint: blog)
+リスト形式のコンテンツタイプ
+
+| フィールドID | 表示名 | 種類 | 必須 |
+|-------------|--------|------|------|
+| title | タイトル | テキストフィールド | true |
+| category | カテゴリー | コンテンツ参照 - カテゴリー | true |
+| body | 本文 | リッチエディタ | true |
+| description | 概要 | テキストフィールド | true |
+| image | 画像 | 画像 | true |
+
+### カテゴリー (endpoint: categories)
+リスト形式のコンテンツタイプ
+
+| フィールドID | 表示名 | 種類 | 必須 |
+|-------------|--------|------|------|
+| name | カテゴリ名 | テキストフィールド | true |
+
 ## プロジェクト構造
 
 ```
@@ -36,12 +56,11 @@ APIキーベース認証（Header: `X-API-Key`）
 ├── cmd/
 │   └── server/          # ローカル開発用サーバー
 ├── internal/
-│   ├── domain/          # エンティティ・バリューオブジェクト
-│   │   ├── article/     # 記事ドメイン
-│   │   └── category/    # カテゴリドメイン
-│   ├── usecase/         # アプリケーションサービス
-│   │   ├── article/
-│   │   └── category/
+│   ├── domain/          # ビジネスルール
+│   │   ├── entity/      # エンティティ
+│   │   ├── service/     # ドメインサービス
+│   │   └── repository/  # リポジトリインターフェース 
+│   ├── usecase/         # アプリケーションのユースケース
 │   ├── infrastructure/  # 外部依存実装
 │   │   ├── microcms/    # microCMS SDK wrapper
 │   │   └── logger/      # zap logger
