@@ -29,6 +29,29 @@ GET /api/v1/categories                        # カテゴリ一覧
 
 APIキーベース認証（Header: `X-API-Key`）
 
+### レスポンス構造
+
+記事データのレスポンス例:
+```json
+{
+  "articles": [
+    {
+      "ID": "article-id",
+      "Title": "記事タイトル",
+      "Image": "https://images.microcms-assets.io/...",
+      "Category": {
+        "Slug": "category-id",
+        "Name": "カテゴリ名"
+      },
+      "Description": "記事の概要",
+      "Body": "<p>記事本文HTML</p>",
+      "CreatedAt": "2023-01-01T00:00:00Z",
+      "UpdatedAt": "2023-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
 ## microCMS APIスキーマ
 
 ### ブログ (endpoint: blog)
@@ -41,6 +64,10 @@ APIキーベース認証（Header: `X-API-Key`）
 | body | 本文 | リッチエディタ | true |
 | description | 概要 | テキストフィールド | true |
 | image | 画像 | 画像 | true |
+
+**注意**: microCMSのAPIレスポンスでは以下の形式で返されます：
+- `image`: オブジェクト形式 `{url: string, height: number, width: number}`
+- `category`: オブジェクト形式 `{id: string, name: string}`
 
 ### カテゴリー (endpoint: categories)
 リスト形式のコンテンツタイプ

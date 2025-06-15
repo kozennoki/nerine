@@ -66,13 +66,46 @@ All endpoints require `X-API-Key` header matching the `NERINE_API_KEY` environme
 
 ### Blog (endpoint: blog)
 - title: Text field (required)
-- category: Content reference to categories (required)
+- category: Content reference to categories (required, returns object with id and name)
 - body: Rich editor (required)
 - description: Text field (required)
-- image: Image field (required)
+- image: Image field (required, returns object with url, height, width)
 
 ### Categories (endpoint: categories)
 - name: Text field (required)
+
+## microCMS Response Structure
+
+### Article Field
+```go
+type article struct {
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Image       image     `json:"image"`
+	Category    category  `json:"category"`
+	Description string    `json:"description"`
+	Body        string    `json:"body"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+```
+
+### Image Field
+```go
+type image struct {
+    URL    string `json:"url"`
+    Height int    `json:"height"`
+    Width  int    `json:"width"`
+}
+```
+
+### Category Reference
+```go
+type category struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+}
+```
 
 ## Entity Implementation
 
@@ -82,7 +115,7 @@ type Article struct {
 	ID          string
 	Title       string
 	Image       string
-	Category    string
+	Category    Category
 	Description string
 	Body        string
 	CreatedAt   time.Time
@@ -97,6 +130,20 @@ type Category struct {
 	Name string
 }
 ```
+
+## Data Mapping
+
+### microCMS to Entity Conversion
+
+**Article Mapping:**
+- `item.Image.URL` → `entity.Article.Image` (string)
+- `item.Category.ID` → `entity.Article.Category.Slug` (string)
+- `item.Category.Name` → `entity.Article.Category.Name` (string)
+
+**Key Points:**
+- microCMS image field is an object containing URL, height, width - we extract only the URL
+- microCMS category field is a reference object containing ID and name - we map ID to Slug and name to Name
+- All other fields are mapped directly without transformation
 
 ## UseCase Pattern
 
