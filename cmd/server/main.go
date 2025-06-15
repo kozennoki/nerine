@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/joho/godotenv"
 	"github.com/kozennoki/nerine/internal/infrastructure/config"
 	"github.com/kozennoki/nerine/internal/infrastructure/logger"
 	"github.com/kozennoki/nerine/internal/infrastructure/microcms"
@@ -14,6 +15,10 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
 	zapLogger, err := logger.New()
 	if err != nil {
 		log.Fatal("Failed to initialize logger:", err)
