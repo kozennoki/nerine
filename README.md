@@ -59,7 +59,7 @@ APIキーベース認証（Header: `X-API-Key`）
 │   ├── domain/          # ビジネスルール
 │   │   ├── entity/      # エンティティ
 │   │   ├── service/     # ドメインサービス
-│   │   └── repository/  # リポジトリインターフェース 
+│   │   └── repository/  # リポジトリインターフェース
 │   ├── usecase/         # アプリケーションのユースケース
 │   ├── infrastructure/  # 外部依存実装
 │   │   ├── microcms/    # microCMS SDK wrapper
@@ -76,7 +76,7 @@ APIキーベース認証（Header: `X-API-Key`）
 ```bash
 MICROCMS_API_KEY=your_microcms_api_key
 MICROCMS_SERVICE_ID=your_microcms_service_id
-BFF_API_KEY=your_bff_api_key
+NERINE_API_KEY=your_nerine_api_key
 PORT=8080
 ```
 

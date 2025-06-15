@@ -36,13 +36,13 @@ go test ./...
 
 Required environment variables:
 - `MICROCMS_API_KEY`: microCMS API key
-- `MICROCMS_SERVICE_ID`: microCMS service ID  
-- `BFF_API_KEY`: API key for BFF authentication
+- `MICROCMS_SERVICE_ID`: microCMS service ID
+- `NERINE_API_KEY`: API key for nerine authentication
 - `PORT`: Server port (default: 8080)
 
 ## API Authentication
 
-All endpoints require `X-API-Key` header matching the `BFF_API_KEY` environment variable.
+All endpoints require `X-API-Key` header matching the `NERINE_API_KEY` environment variable.
 
 ## Key Dependencies
 
@@ -120,3 +120,11 @@ func NewGetArticles(
     }
 }
 ```
+
+## Development Workflow
+
+When starting work on this project, follow these steps:
+1. **Read README.md** to understand the project structure and design
+2. **Check docs/tasks.md** to see current tasks and priorities
+3. **Update docs/tasks.md** after completing each task to maintain progress tracking
+4. Follow Clean Architecture principles and maintain layer separation throughout implementation
