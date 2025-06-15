@@ -22,9 +22,9 @@
 - [ ] エラーハンドリング統一
 
 #### Repository Layer
-- [ ] ArticleRepository インターフェース定義
-- [ ] CategoryRepository インターフェース定義
-- [ ] microCMS SDK integration
+- [x] ArticleRepository インターフェース定義
+- [x] CategoryRepository インターフェース定義
+- [x] microCMS SDK integration
 
 #### UseCase Layer
 - [ ] GetArticlesUsecase 実装
