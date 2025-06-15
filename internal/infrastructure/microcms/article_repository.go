@@ -24,12 +24,18 @@ func NewArticleRepository(apiKey, serviceID string) repository.ArticleRepository
 type article struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
-	Image       string    `json:"image"`
-	Category    string    `json:"category"`
+	Image       image     `json:"image"`
+	Category    category  `json:"category"`
 	Description string    `json:"description"`
 	Body        string    `json:"body"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+type image struct {
+	URL    string `json:"url"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
 }
 
 type articleListResponse struct {
@@ -55,10 +61,13 @@ func (r *articleRepository) GetArticles(ctx context.Context, limit, offset int) 
 	articles := make([]*entity.Article, len(res.Contents))
 	for i, item := range res.Contents {
 		articles[i] = &entity.Article{
-			ID:          item.ID,
-			Title:       item.Title,
-			Image:       item.Image,
-			Category:    item.Category,
+			ID:    item.ID,
+			Title: item.Title,
+			Image: item.Image.URL,
+			Category: entity.Category{
+				Slug: item.Category.ID,
+				Name: item.Category.Name,
+			},
 			Description: item.Description,
 			Body:        item.Body,
 			CreatedAt:   item.CreatedAt,
@@ -82,10 +91,13 @@ func (r *articleRepository) GetArticleByID(ctx context.Context, id string) (*ent
 	}
 
 	return &entity.Article{
-		ID:          res.ID,
-		Title:       res.Title,
-		Image:       res.Image,
-		Category:    res.Category,
+		ID:    res.ID,
+		Title: res.Title,
+		Image: res.Image.URL,
+		Category: entity.Category{
+			Slug: res.Category.ID,
+			Name: res.Category.Name,
+		},
 		Description: res.Description,
 		Body:        res.Body,
 		CreatedAt:   res.CreatedAt,
@@ -110,10 +122,13 @@ func (r *articleRepository) GetArticlesByCategory(ctx context.Context, categoryS
 	articles := make([]*entity.Article, len(res.Contents))
 	for i, item := range res.Contents {
 		articles[i] = &entity.Article{
-			ID:          item.ID,
-			Title:       item.Title,
-			Image:       item.Image,
-			Category:    item.Category,
+			ID:    item.ID,
+			Title: item.Title,
+			Image: item.Image.URL,
+			Category: entity.Category{
+				Slug: item.Category.ID,
+				Name: item.Category.Name,
+			},
 			Description: item.Description,
 			Body:        item.Body,
 			CreatedAt:   item.CreatedAt,
@@ -145,10 +160,13 @@ func (r *articleRepository) GetLatestArticles(ctx context.Context, limit int) ([
 	articles := make([]*entity.Article, len(res.Contents))
 	for i, item := range res.Contents {
 		articles[i] = &entity.Article{
-			ID:          item.ID,
-			Title:       item.Title,
-			Image:       item.Image,
-			Category:    item.Category,
+			ID:    item.ID,
+			Title: item.Title,
+			Image: item.Image.URL,
+			Category: entity.Category{
+				Slug: item.Category.ID,
+				Name: item.Category.Name,
+			},
 			Description: item.Description,
 			Body:        item.Body,
 			CreatedAt:   item.CreatedAt,
