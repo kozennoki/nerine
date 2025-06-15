@@ -6,10 +6,10 @@ import (
 )
 
 type Config struct {
-	Port            string
-	MicroCMSAPIKey  string
+	Port              string
+	MicroCMSAPIKey    string
 	MicroCMSServiceID string
-	NerineAPIKey    string
+	NerineAPIKey      string
 }
 
 func Load() (*Config, error) {
