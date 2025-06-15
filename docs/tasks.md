@@ -4,8 +4,9 @@
 
 - ✅ プロジェクト基盤セットアップ
 - ✅ HTTPサーバー基本実装
-- 🔄 現在進行中: ドキュメント整備
-- ⏳ 次のフェーズ: API実装
+- ✅ 基本API実装完了
+- 🔄 現在進行中: 機能拡張・最適化
+- ⏳ 次のフェーズ: テスト・デプロイ準備
 
 ## 優先度別タスク
 
@@ -14,6 +15,7 @@
 #### 認証・セキュリティ
 - [x] API キー認証ミドルウェア実装
 - [x] 環境変数バリデーション
+- [x] godotenv パッケージ導入（.env ファイル自動読み込み）
 - [ ] CORS設定
 
 #### ログ・監視
@@ -27,15 +29,15 @@
 - [x] microCMS SDK integration
 
 #### UseCase Layer
-- [ ] GetArticlesUsecase 実装
-- [ ] GetArticleByIDUsecase 実装
-- [ ] GetCategoriesUsecase 実装
+- [x] GetArticlesUsecase 実装
+- [x] GetArticleByIDUsecase 実装
+- [x] GetCategoriesUsecase 実装
 - [ ] GetArticlesByCategoryUsecase 実装
 
 #### Handler Layer
-- [ ] 記事一覧 API (`GET /api/v1/articles`)
-- [ ] 記事詳細 API (`GET /api/v1/articles/:id`)
-- [ ] カテゴリ一覧 API (`GET /api/v1/categories`)
+- [x] 記事一覧 API (`GET /api/v1/articles`)
+- [x] 記事詳細 API (`GET /api/v1/articles/:id`)
+- [x] カテゴリ一覧 API (`GET /api/v1/categories`)
 - [ ] カテゴリ別記事一覧 API (`GET /api/v1/categories/:slug/articles`)
 
 ### 🟡 中優先度 (機能拡張)
