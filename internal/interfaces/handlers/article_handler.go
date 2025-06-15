@@ -9,14 +9,17 @@ import (
 )
 
 type ArticleHandler struct {
-	getArticlesUsecase usecase.GetArticlesUsecase
+	getArticlesUsecase    usecase.GetArticlesUsecase
+	getArticleByIDUsecase usecase.GetArticleByIDUsecase
 }
 
 func NewArticleHandler(
 	getArticlesUsecase usecase.GetArticlesUsecase,
+	getArticleByIDUsecase usecase.GetArticleByIDUsecase,
 ) *ArticleHandler {
 	return &ArticleHandler{
-		getArticlesUsecase: getArticlesUsecase,
+		getArticlesUsecase:    getArticlesUsecase,
+		getArticleByIDUsecase: getArticleByIDUsecase,
 	}
 }
 
@@ -55,5 +58,31 @@ func (h *ArticleHandler) GetArticles(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"articles": output.Articles,
+	})
+}
+
+func (h *ArticleHandler) GetArticleByID(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Article ID is required",
+		})
+	}
+
+	input := usecase.GetArticleByIDUsecaseInput{
+		ID: id,
+	}
+
+	output, err := h.getArticleByIDUsecase.Exec(c.Request().Context(), input)
+	if err != nil {
+		c.Logger().Error("Failed to get article by ID: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error":  "Failed to get article",
+			"detail": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"article": output.Article,
 	})
 }

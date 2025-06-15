@@ -33,17 +33,23 @@ func main() {
 
 	// Repository
 	articleRepo := microcms.NewArticleRepository(cfg.MicroCMSAPIKey, cfg.MicroCMSServiceID)
+	categoryRepo := microcms.NewCategoryRepository(cfg.MicroCMSAPIKey, cfg.MicroCMSServiceID)
 
 	// UseCase
 	getArticlesUsecase := usecase.NewGetArticles(articleRepo)
+	getArticleByIDUsecase := usecase.NewGetArticleByID(articleRepo)
+	getCategoriesUsecase := usecase.NewGetCategories(categoryRepo)
 
 	// Handler
-	articleHandler := handlers.NewArticleHandler(getArticlesUsecase)
+	articleHandler := handlers.NewArticleHandler(getArticlesUsecase, getArticleByIDUsecase)
+	categoryHandler := handlers.NewCategoryHandler(getCategoriesUsecase)
 
 	// Routes
 	api := e.Group("/api/v1")
 	// api.Use(middleware.APIKeyAuth(cfg.NerineAPIKey))
 	api.GET("/articles", articleHandler.GetArticles)
+	api.GET("/articles/:id", articleHandler.GetArticleByID)
+	api.GET("/categories", categoryHandler.GetCategories)
 
 	zapLogger.Info("Starting server", zap.String("port", cfg.Port))
 	if err := e.Start(":" + cfg.Port); err != nil {
