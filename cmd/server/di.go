@@ -1,0 +1,33 @@
+package main
+
+import (
+	"github.com/kozennoki/nerine/internal/infrastructure/config"
+	"github.com/kozennoki/nerine/internal/infrastructure/microcms"
+	"github.com/kozennoki/nerine/internal/interfaces/handlers"
+	"github.com/kozennoki/nerine/internal/usecase"
+)
+
+type DIContainer struct {
+	ArticleHandler  *handlers.ArticleHandler
+	CategoryHandler *handlers.CategoryHandler
+}
+
+func NewDIContainer(cfg *config.Config) *DIContainer {
+	// Repository
+	articleRepo := microcms.NewArticleRepository(cfg.MicroCMSAPIKey, cfg.MicroCMSServiceID)
+	categoryRepo := microcms.NewCategoryRepository(cfg.MicroCMSAPIKey, cfg.MicroCMSServiceID)
+
+	// UseCase
+	getArticlesUsecase := usecase.NewGetArticles(articleRepo)
+	getArticleByIDUsecase := usecase.NewGetArticleByID(articleRepo)
+	getCategoriesUsecase := usecase.NewGetCategories(categoryRepo)
+
+	// Handler
+	articleHandler := handlers.NewArticleHandler(getArticlesUsecase, getArticleByIDUsecase)
+	categoryHandler := handlers.NewCategoryHandler(getCategoriesUsecase)
+
+	return &DIContainer{
+		ArticleHandler:  articleHandler,
+		CategoryHandler: categoryHandler,
+	}
+}
