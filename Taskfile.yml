@@ -6,6 +6,19 @@ tasks:
     cmds:
       - go test ./...
 
+  generate-mocks:
+    desc: Generate mocks for all interfaces
+    aliases: [g]
+    cmds:
+      # repository
+      - mockgen -source=internal/domain/repository/article.go -destination=internal/domain/repository/mocks/mock_article_repository.go -package=mocks
+      - mockgen -source=internal/domain/repository/category.go -destination=internal/domain/repository/mocks/mock_category_repository.go -package=mocks
+
+      # usecase
+      - mockgen -source=internal/usecase/get_articles.go -destination=internal/usecase/mocks/mock_get_articles_usecase.go -package=mocks
+      - mockgen -source=internal/usecase/get_article_by_id.go -destination=internal/usecase/mocks/mock_get_article_by_id_usecase.go -package=mocks
+      - mockgen -source=internal/usecase/get_categories.go -destination=internal/usecase/mocks/mock_get_categories_usecase.go -package=mocks
+
   coverage:
     desc: Run tests and generate coverage report
     cmds:
