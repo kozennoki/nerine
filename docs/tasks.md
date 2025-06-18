@@ -12,6 +12,19 @@
 
 ### 🔴 高優先度 (必須機能)
 
+#### テスト実装 (gomock)
+- [ ] gomock セットアップ (go.mod追加)
+- [ ] mock生成用タスクをTaskfile.ymlに追加
+- [ ] ArticleRepository mock生成
+- [ ] CategoryRepository mock生成
+- [ ] UseCase interface mock生成 (Handler層テスト用)
+- [ ] GetArticlesUsecase テスト実装
+- [ ] GetArticleByIDUsecase テスト実装  
+- [ ] GetCategoriesUsecase テスト実装
+- [ ] ArticleHandler テスト実装
+- [ ] CategoryHandler テスト実装
+- [ ] テストカバレッジ目標: 80%以上
+
 #### 認証・セキュリティ
 - [x] API キー認証ミドルウェア実装
 - [x] 環境変数バリデーション
@@ -55,11 +68,11 @@
 
 ### 🟢 低優先度 (最適化・運用)
 
-#### テスト
-- [ ] ユニットテスト (gomock)
-- [ ] 統合テスト
+#### 高度なテスト
+- [ ] 統合テスト (実際のmicroCMS API使用)
 - [ ] パフォーマンステスト
 - [ ] セキュリティテスト
+- [ ] E2Eテスト
 
 #### デプロイ・インフラ
 - [ ] Lambda用エントリーポイント実装
@@ -79,11 +92,26 @@
 
 ## 次のアクション
 
-1. **API認証ミドルウェア実装** - セキュリティの基盤
-2. **構造化ログ設定** - 運用監視の基盤
-3. **Repository実装** - データアクセス層
-4. **UseCase実装** - ビジネスロジック層
-5. **Handler実装** - API エンドポイント
+### 🎯 現在の最優先: gomockユニットテスト実装
+
+1. **gomockセットアップ** - テスト基盤構築
+   - go.modにgomock追加
+   - Taskfile.ymlにmock生成タスク追加
+   
+2. **UseCase層テスト実装** - ビジネスロジック検証
+   - Repository mockを使用
+   - 正常系・異常系の網羅的テスト
+   
+3. **Handler層テスト実装** - HTTP API検証  
+   - UseCase mockを使用
+   - リクエスト/レスポンスの検証
+
+### 📋 実装順序
+1. gomock環境構築
+2. mock生成 (Repository, UseCase interfaces)
+3. UseCase層テスト (get_articles, get_article_by_id, get_categories)
+4. Handler層テスト (article_handler, category_handler)
+5. テストカバレッジ測定・改善
 
 ## 注意事項
 
