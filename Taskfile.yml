@@ -3,6 +3,7 @@ version: '3'
 tasks:
   test:
     desc: Run all tests
+    aliases: [t]
     cmds:
       - go test ./...
 
@@ -21,6 +22,7 @@ tasks:
 
   coverage:
     desc: Run tests and generate coverage report
+    aliases: [cov]
     cmds:
       - go test -coverprofile=coverage/coverage.out ./...
       - go tool cover -func=coverage/coverage.out
