@@ -5,24 +5,27 @@
 - ✅ プロジェクト基盤セットアップ
 - ✅ HTTPサーバー基本実装
 - ✅ 基本API実装完了
-- 🔄 現在進行中: 機能拡張・最適化
-- ⏳ 次のフェーズ: テスト・デプロイ準備
+- ✅ gomock テスト基盤構築完了
+- ✅ 基本ユニットテスト実装完了
+- 🔄 現在進行中: テスト拡張・機能追加
+- ⏳ 次のフェーズ: デプロイ準備・パフォーマンス最適化
 
 ## 優先度別タスク
 
 ### 🔴 高優先度 (必須機能)
 
 #### テスト実装 (gomock)
-- [ ] gomock セットアップ (go.mod追加)
-- [ ] mock生成用タスクをTaskfile.ymlに追加
-- [ ] ArticleRepository mock生成
-- [ ] CategoryRepository mock生成
+- [x] gomock セットアップ (go.mod追加)
+- [x] mock生成用タスクをTaskfile.ymlに追加
+- [x] ArticleRepository mock生成
+- [x] CategoryRepository mock生成
+- [x] GetArticlesUsecase テスト実装
+- [x] GetArticleByIDUsecase テスト実装  
+- [x] GetCategoriesUsecase テスト実装
+- [x] ArticleHandler テスト実装
+- [x] CategoryHandler テスト実装
 - [ ] UseCase interface mock生成 (Handler層テスト用)
-- [ ] GetArticlesUsecase テスト実装
-- [ ] GetArticleByIDUsecase テスト実装  
-- [ ] GetCategoriesUsecase テスト実装
-- [ ] ArticleHandler テスト実装
-- [ ] CategoryHandler テスト実装
+- [ ] Handler層テスト拡張・エラーケース強化
 - [ ] テストカバレッジ目標: 80%以上
 
 #### 認証・セキュリティ
@@ -90,28 +93,42 @@
 - [x] ヘルスチェックエンドポイント
 - [x] 環境変数設定 (PORT)
 
+### ✅ Phase 2: API・テスト基盤構築
+- [x] microCMS SDK integration
+- [x] Repository層実装 (Article, Category)
+- [x] UseCase層実装 (GetArticles, GetArticleByID, GetCategories)
+- [x] Handler層実装 (基本API)
+- [x] gomock環境セットアップ
+- [x] Repository mock生成
+- [x] UseCase層ユニットテスト実装
+- [x] Handler層基本テスト実装
+- [x] 構造化ログ (zap) セットアップ
+- [x] API キー認証ミドルウェア実装
+
 ## 次のアクション
 
-### 🎯 現在の最優先: gomockユニットテスト実装
+### 🎯 現在の最優先: テスト拡張・機能追加
 
-1. **gomockセットアップ** - テスト基盤構築
-   - go.modにgomock追加
-   - Taskfile.ymlにmock生成タスク追加
+1. **UseCaseインターフェースmock生成** - Handler層テスト強化
+   - UseCase interfaceのmock生成
+   - Handler層でのテスト拡張
    
-2. **UseCase層テスト実装** - ビジネスロジック検証
-   - Repository mockを使用
-   - 正常系・異常系の網羅的テスト
+2. **テストカバレッジ改善** - 品質向上
+   - エラーケースの網羅的テスト
+   - カバレッジ80%以上達成
    
-3. **Handler層テスト実装** - HTTP API検証  
-   - UseCase mockを使用
-   - リクエスト/レスポンスの検証
+3. **新機能実装** - API機能拡張
+   - カテゴリ別記事一覧API実装
+   - 追加エンドポイントのテスト実装
 
 ### 📋 実装順序
-1. gomock環境構築
-2. mock生成 (Repository, UseCase interfaces)
-3. UseCase層テスト (get_articles, get_article_by_id, get_categories)
-4. Handler層テスト (article_handler, category_handler)
-5. テストカバレッジ測定・改善
+1. ✅ gomock環境構築 (完了)
+2. ✅ Repository mock生成 (完了)
+3. ✅ UseCase層テスト実装 (完了)
+4. ✅ Handler層基本テスト (完了)
+5. 🔄 UseCase interface mock生成
+6. 🔄 Handler層テスト拡張
+7. ⏳ テストカバレッジ測定・改善
 
 ## 注意事項
 
