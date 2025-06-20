@@ -29,7 +29,17 @@ go mod tidy
 go run cmd/server/main.go
 
 # Run tests
-go test ./...
+task test              # Run all tests
+go test ./...          # Alternative command
+go test -v ./...       # Verbose output
+
+# Generate mocks
+task generate-mocks    # Generate all mocks
+task g                 # Alias for generate-mocks
+
+# Test coverage
+task coverage          # Generate coverage report
+task cov               # Alias for coverage
 ```
 
 ## Environment Variables
@@ -61,6 +71,94 @@ All endpoints require `X-API-Key` header matching the `NERINE_API_KEY` environme
 - Implement dependency injection for testability
 - Generate mocks with gomock for unit testing
 - Structure logging with zap for production readiness
+
+## Testing Guidelines
+
+### Test Structure
+- Use `package xxx_test` pattern for external testing
+- Create `export_test.go` files to expose private functions/methods for testing
+- Organize tests with clear naming: `TestFunctionName_Scenario`
+
+### Test Execution
+- Enable parallel execution with `t.Parallel()` for tests that don't share global state
+- Avoid parallel execution for tests that modify environment variables or global state
+- Use table-driven tests for multiple scenarios
+
+### Mock Generation and Usage
+- Generate mocks using `task generate-mocks` or `go.uber.org/mock/mockgen`
+- Store mocks in `mocks/` directories within each layer
+- Use dependency injection to make code testable with mocks
+
+### Test Coverage
+- Target 80%+ test coverage for production code
+- Focus on business logic in UseCase and Handler layers
+- Test both success and error scenarios
+- Use `task coverage` to generate coverage reports
+
+### Test Organization by Layer
+
+#### UseCase Layer Testing
+```go
+// Test pattern with repository mocks
+func TestUseCaseName_Exec(t *testing.T) {
+    t.Parallel()
+    
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    
+    mockRepo := mocks.NewMockRepository(ctrl)
+    usecase := NewUseCase(mockRepo)
+    
+    // Setup expectations and test
+}
+```
+
+#### Handler Layer Testing
+```go
+// Test pattern with usecase mocks
+func TestHandlerName_Method(t *testing.T) {
+    t.Parallel()
+    
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    
+    mockUseCase := mocks.NewMockUseCase(ctrl)
+    handler := NewHandler(mockUseCase)
+    
+    // Setup Echo context and test HTTP handling
+}
+```
+
+#### Infrastructure Layer Testing
+```go
+// Test pattern for configuration and utilities
+func TestConfigLoad_Success(t *testing.T) {
+    // No t.Parallel() for environment variable tests
+    
+    os.Setenv("KEY", "value")
+    defer os.Unsetenv("KEY")
+    
+    // Test configuration loading
+}
+
+func TestUtilityFunction(t *testing.T) {
+    t.Parallel() // Safe for pure functions
+    
+    // Test utility functions
+}
+```
+
+### Environment Variable Testing
+- Tests modifying environment variables should NOT use `t.Parallel()`
+- Use `defer os.Unsetenv()` to clean up after tests
+- Group environment variable tests to run sequentially
+
+### Best Practices
+- Write tests before or alongside implementation (TDD/BDD approach)
+- Test error conditions and edge cases thoroughly
+- Use meaningful test names that describe the scenario
+- Keep tests focused and independent
+- Use `export_test.go` for testing private functions when necessary
 
 ## microCMS API Schema
 

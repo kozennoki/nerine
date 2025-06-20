@@ -7,8 +7,26 @@
 - ✅ 基本API実装完了
 - ✅ gomock テスト基盤構築完了
 - ✅ 基本ユニットテスト実装完了
-- 🔄 現在進行中: テスト拡張・機能追加
+- ✅ インフラストラクチャテスト実装完了
+- ✅ テスト設計ベストプラクティス確立
+- 🔄 現在進行中: 機能追加・カバレッジ向上
 - ⏳ 次のフェーズ: デプロイ準備・パフォーマンス最適化
+
+## 現在のテスト状況
+
+**テストカバレッジ: 42.9%** (目標: 80%+)
+
+**✅ 100%カバレッジ達成:**
+- `internal/infrastructure/config/` - 設定管理
+- `internal/infrastructure/logger/` - ログ機能
+- `internal/infrastructure/microcms/client.go` - クライアント
+- `internal/interfaces/middleware/auth.go` - 認証
+- `internal/usecase/` - 全UseCase
+- `internal/interfaces/handlers/` - 全Handler
+
+**⏳ 0%カバレッジ (要改善):**
+- `internal/infrastructure/microcms/` - Repository実装
+- `cmd/server/` - サーバーエントリーポイント
 
 ## 優先度別タスク
 
@@ -105,6 +123,16 @@
 - [x] 構造化ログ (zap) セットアップ
 - [x] API キー認証ミドルウェア実装
 
+### ✅ Phase 3: インフラストラクチャテスト実装
+- [x] config.go テスト実装 (環境変数読み込み・バリデーション)
+- [x] logger.go テスト実装 (zapロガー生成)
+- [x] client.go テスト実装 (microCMSクライアント)
+- [x] auth.go テスト実装 (APIキー認証ミドルウェア)
+- [x] テスト並列実行最適化
+- [x] export_test.goパターン実装 (非公開関数テスト)
+- [x] package xxx_testパターン実装
+- [x] 環境変数テスト安全性確保 (並列実行制御)
+
 ## 次のアクション
 
 ### 🎯 現在の最優先: テスト拡張・機能追加
@@ -130,9 +158,68 @@
 6. 🔄 Handler層テスト拡張
 7. ⏳ テストカバレッジ測定・改善
 
+## テスト設計ガイドライン
+
+### 確立されたパターン
+
+#### 1. テストファイル構成
+```
+internal/
+├── package/
+│   ├── file.go
+│   ├── export_test.go     # 非公開関数・メソッドの公開
+│   └── file_test.go       # package package_test
+```
+
+#### 2. 並列実行ルール
+- **環境変数使用**: `t.Parallel()`を使わない (グローバル状態競合回避)
+- **純粋関数**: `t.Parallel()`を積極的に使用 (実行速度向上)
+- **サブテスト**: ネストしたテストでも並列実行を活用
+
+#### 3. Mockパターン
+```go
+// UseCase層テスト
+func TestUseCase_Exec(t *testing.T) {
+    t.Parallel()
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    
+    mockRepo := mocks.NewMockRepository(ctrl)
+    // テストロジック
+}
+
+// Handler層テスト  
+func TestHandler_Method(t *testing.T) {
+    t.Parallel()
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    
+    mockUseCase := mocks.NewMockUseCase(ctrl)
+    // HTTPテストロジック
+}
+```
+
+#### 4. 環境変数テスト安全パターン
+```go
+func TestEnvDependentFunction(t *testing.T) {
+    // t.Parallel() なし
+    os.Setenv("KEY", "value")
+    defer os.Unsetenv("KEY")
+    // テストロジック
+}
+```
+
+### テストカバレッジ戦略
+- **ビジネスロジック**: UseCase層で100%カバレッジ
+- **HTTP処理**: Handler層で正常系・異常系テスト
+- **インフラ**: 設定・ログ・認証の確実なテスト
+- **統合**: 実際のAPIコール部分は統合テストで補完
+
 ## 注意事項
 
 - 各タスクは Clean Architecture の原則に従って実装
 - DDD パターンを維持
 - テスト可能な設計を心がける
 - 将来のLambda対応を考慮した実装
+- テスト並列実行でパフォーマンス最適化
+- 環境変数テストは慎重に設計 (競合回避)
