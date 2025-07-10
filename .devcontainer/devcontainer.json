@@ -9,5 +9,9 @@
         "golang.Go"
       ]
     }
-  }
+  },
+  "runArgs": [
+    "--name=nerine",
+    "--network=dev-kozennoki"
+  ]
 }
