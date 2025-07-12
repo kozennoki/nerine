@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/kozennoki/nerine/internal/infrastructure/config"
+	"github.com/kozennoki/nerine/internal/interfaces/middleware"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,7 +14,7 @@ func setupRoutes(e *echo.Echo, di *DIContainer, cfg *config.Config) {
 	})
 
 	api := e.Group("/api/v1")
-	// api.Use(middleware.APIKeyAuth(cfg.NerineAPIKey))
+	api.Use(middleware.APIKeyAuth(cfg.NerineAPIKey))
 	api.GET("/articles", di.ArticleHandler.GetArticles)
 	api.GET("/articles/:id", di.ArticleHandler.GetArticleByID)
 	api.GET("/categories", di.CategoryHandler.GetCategories)
