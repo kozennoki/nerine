@@ -14,6 +14,7 @@ type TestAPIHandlerMocks struct {
 	GetLatestArticlesUsecase     *mocks.MockGetLatestArticlesUsecase
 	GetArticlesByCategoryUsecase *mocks.MockGetArticlesByCategoryUsecase
 	GetCategoriesUsecase         *mocks.MockGetCategoriesUsecase
+	GetZennArticlesUsecase       *mocks.MockGetZennArticlesUsecase
 }
 
 // CreateTestAPIHandler creates APIHandler with mocks for testing
@@ -25,6 +26,7 @@ func CreateTestAPIHandler(ctrl *gomock.Controller) (*handlers.APIHandler, *TestA
 		GetLatestArticlesUsecase:     mocks.NewMockGetLatestArticlesUsecase(ctrl),
 		GetArticlesByCategoryUsecase: mocks.NewMockGetArticlesByCategoryUsecase(ctrl),
 		GetCategoriesUsecase:         mocks.NewMockGetCategoriesUsecase(ctrl),
+		GetZennArticlesUsecase:       mocks.NewMockGetZennArticlesUsecase(ctrl),
 	}
 
 	handler := handlers.NewAPIHandler(
@@ -34,6 +36,7 @@ func CreateTestAPIHandler(ctrl *gomock.Controller) (*handlers.APIHandler, *TestA
 		mocks.GetLatestArticlesUsecase,
 		mocks.GetArticlesByCategoryUsecase,
 		mocks.GetCategoriesUsecase,
+		mocks.GetZennArticlesUsecase,
 	)
 
 	return handler, mocks

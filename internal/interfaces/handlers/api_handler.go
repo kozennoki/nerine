@@ -12,6 +12,7 @@ type APIHandler struct {
 	getLatestArticlesUsecase     usecase.GetLatestArticlesUsecase
 	getArticlesByCategoryUsecase usecase.GetArticlesByCategoryUsecase
 	getCategoriesUsecase         usecase.GetCategoriesUsecase
+	getZennArticlesUsecase       usecase.GetZennArticlesUsecase
 }
 
 func NewAPIHandler(
@@ -21,6 +22,7 @@ func NewAPIHandler(
 	getLatestArticlesUsecase usecase.GetLatestArticlesUsecase,
 	getArticlesByCategoryUsecase usecase.GetArticlesByCategoryUsecase,
 	getCategoriesUsecase usecase.GetCategoriesUsecase,
+	getZennArticlesUsecase usecase.GetZennArticlesUsecase,
 ) *APIHandler {
 	return &APIHandler{
 		getArticlesUsecase:           getArticlesUsecase,
@@ -29,6 +31,7 @@ func NewAPIHandler(
 		getLatestArticlesUsecase:     getLatestArticlesUsecase,
 		getArticlesByCategoryUsecase: getArticlesByCategoryUsecase,
 		getCategoriesUsecase:         getCategoriesUsecase,
+		getZennArticlesUsecase:       getZennArticlesUsecase,
 	}
 }
 
