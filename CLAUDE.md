@@ -35,7 +35,11 @@ go test -v ./...       # Verbose output
 
 # Generate mocks
 task generate-mocks    # Generate all mocks
-task g                 # Alias for generate-mocks
+task gen-mocks         # Alias for generate-mocks
+
+# Generate OpenAPI code
+task generate-openapi  # Generate Go code from OpenAPI schema
+task gen-api          # Alias for generate-openapi
 
 # Test coverage
 task coverage          # Generate coverage report
@@ -102,13 +106,13 @@ All endpoints require `X-API-Key` header matching the `NERINE_API_KEY` environme
 // Test pattern with repository mocks
 func TestUseCaseName_Exec(t *testing.T) {
     t.Parallel()
-    
+
     ctrl := gomock.NewController(t)
     defer ctrl.Finish()
-    
+
     mockRepo := mocks.NewMockRepository(ctrl)
     usecase := NewUseCase(mockRepo)
-    
+
     // Setup expectations and test
 }
 ```
@@ -118,13 +122,13 @@ func TestUseCaseName_Exec(t *testing.T) {
 // Test pattern with usecase mocks
 func TestHandlerName_Method(t *testing.T) {
     t.Parallel()
-    
+
     ctrl := gomock.NewController(t)
     defer ctrl.Finish()
-    
+
     mockUseCase := mocks.NewMockUseCase(ctrl)
     handler := NewHandler(mockUseCase)
-    
+
     // Setup Echo context and test HTTP handling
 }
 ```
@@ -134,16 +138,16 @@ func TestHandlerName_Method(t *testing.T) {
 // Test pattern for configuration and utilities
 func TestConfigLoad_Success(t *testing.T) {
     // No t.Parallel() for environment variable tests
-    
+
     os.Setenv("KEY", "value")
     defer os.Unsetenv("KEY")
-    
+
     // Test configuration loading
 }
 
 func TestUtilityFunction(t *testing.T) {
     t.Parallel() // Safe for pure functions
-    
+
     // Test utility functions
 }
 ```
@@ -266,9 +270,9 @@ func NewGetArticles(
 }
 ```
 
-## OpenAPI Schema
+## OpenAPI Schema-Driven Development
 
-This project includes OpenAPI 3.0 schema definitions for the API specification via git submodule.
+This project uses OpenAPI schema-driven development with automatic code generation.
 
 ### Schema Repository
 - **Repository**: `hibiscus` (https://github.com/kozennoki/hibiscus.git)
@@ -286,6 +290,39 @@ git commit -m "📚 API スキーマを更新"
 git submodule update --init --recursive
 ```
 
+### Code Generation Setup
+
+The project uses `oapi-codegen v2` for automatic Go code generation from OpenAPI specifications.
+
+**Generated Code Location**: `internal/openapi/openapi.go`
+
+**Generated Contents**:
+- Type definitions (Article, Category, Pagination, etc.)
+- ServerInterface for all API endpoints
+- Echo handlers with parameter parsing and validation
+- Response models matching OpenAPI specification
+
+### Integration Pattern
+
+1. **Handlers implement ServerInterface**: All handlers implement `openapi.ServerInterface`
+2. **Type conversion via Presenter**: `internal/interfaces/presenter/converter.go` converts between domain entities and generated types
+3. **Automatic routing**: Generated routes are registered via `openapi.RegisterHandlers()`
+
+### Development Workflow for API Changes
+
+When making API changes:
+1. **Update OpenAPI schema** in `schema/openapi.yaml`
+2. **Regenerate code** with `task gen-api`
+3. **Update converters** in `presenter/converter.go` if new fields are added
+4. **Test integration** to ensure type compatibility
+
+### Benefits
+
+- **Schema-first design**: API specification drives implementation
+- **Type safety**: Generated types ensure API compliance
+- **Automatic validation**: Parameter parsing and validation generated from schema
+- **Documentation sync**: Code always matches specification
+
 The OpenAPI schema serves as the single source of truth for API specifications shared between:
 - **Nerine** (BFF API - this repository)
 - **Abelia** (Frontend Next.js application)
@@ -296,4 +333,5 @@ When starting work on this project, follow these steps:
 1. **Read README.md** to understand the project structure and design
 2. **Check docs/tasks.md** to see current tasks and priorities
 3. **Update docs/tasks.md** after completing each task to maintain progress tracking
-4. Follow Clean Architecture principles and maintain layer separation throughout implementation
+4. **Use schema-driven development**: When making API changes, update OpenAPI schema first, then regenerate code with `task gen-api`
+5. Follow Clean Architecture principles and maintain layer separation throughout implementation
