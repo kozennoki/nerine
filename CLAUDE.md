@@ -266,6 +266,30 @@ func NewGetArticles(
 }
 ```
 
+## OpenAPI Schema
+
+This project includes OpenAPI 3.0 schema definitions for the API specification via git submodule.
+
+### Schema Repository
+- **Repository**: `hibiscus` (https://github.com/kozennoki/hibiscus.git)
+- **Local Path**: `schema/`
+- **Main File**: `schema/openapi.yaml`
+
+### Schema Management
+```bash
+# Update schema to latest version
+git submodule update --remote schema
+git add schema
+git commit -m "📚 API スキーマを更新"
+
+# Initialize submodules (for new clones)
+git submodule update --init --recursive
+```
+
+The OpenAPI schema serves as the single source of truth for API specifications shared between:
+- **Nerine** (BFF API - this repository)
+- **Abelia** (Frontend Next.js application)
+
 ## Development Workflow
 
 When starting work on this project, follow these steps:
