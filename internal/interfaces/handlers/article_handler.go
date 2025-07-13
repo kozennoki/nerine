@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
+	"github.com/kozennoki/nerine/internal/openapi"
+	"github.com/kozennoki/nerine/internal/interfaces/presenter"
 	"github.com/kozennoki/nerine/internal/usecase"
 	"github.com/labstack/echo/v4"
 )
@@ -32,22 +33,15 @@ func NewArticleHandler(
 	}
 }
 
-func (h *ArticleHandler) GetArticles(c echo.Context) error {
-	pageStr := c.QueryParam("page")
-	limitStr := c.QueryParam("limit")
-
+func (h *ArticleHandler) GetArticles(ctx echo.Context, params openapi.GetArticlesParams) error {
 	page := 1
-	if pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p >= 1 {
-			page = p
-		}
+	if params.Page != nil {
+		page = *params.Page
 	}
 
 	limit := 10
-	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
+	if params.Limit != nil {
+		limit = *params.Limit
 	}
 
 	input := usecase.GetArticlesUsecaseInput{
@@ -55,26 +49,26 @@ func (h *ArticleHandler) GetArticles(c echo.Context) error {
 		Limit: limit,
 	}
 
-	output, err := h.getArticlesUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getArticlesUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get articles: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get articles",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get articles: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get articles",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"articles":   output.Articles,
-		"pagination": output.Pagination,
+	return ctx.JSON(http.StatusOK, openapi.ArticlesResponse{
+		Articles:   presenter.ConvertArticles(output.Articles),
+		Pagination: presenter.ConvertPagination(output.Pagination),
 	})
 }
 
-func (h *ArticleHandler) GetArticleByID(c echo.Context) error {
-	id := c.Param("id")
+func (h *ArticleHandler) GetArticleById(ctx echo.Context, id string) error {
 	if id == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Article ID is required",
+		return ctx.JSON(http.StatusBadRequest, openapi.ErrorResponse{
+			Error: "Article ID is required",
 		})
 	}
 
@@ -82,99 +76,86 @@ func (h *ArticleHandler) GetArticleByID(c echo.Context) error {
 		ID: id,
 	}
 
-	output, err := h.getArticleByIDUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getArticleByIDUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get article by ID: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get article",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get article by ID: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get article",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"article": output.Article,
+	return ctx.JSON(http.StatusOK, openapi.ArticleResponse{
+		Article: presenter.ConvertArticle(output.Article),
 	})
 }
 
-func (h *ArticleHandler) GetPopularArticles(c echo.Context) error {
-	limitStr := c.QueryParam("limit")
-
+func (h *ArticleHandler) GetPopularArticles(ctx echo.Context, params openapi.GetPopularArticlesParams) error {
 	limit := 5
-	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
+	if params.Limit != nil {
+		limit = *params.Limit
 	}
 
 	input := usecase.GetPopularArticlesUsecaseInput{
 		Limit: limit,
 	}
 
-	output, err := h.getPopularArticlesUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getPopularArticlesUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get popular articles: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get articles",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get popular articles: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get articles",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"articles": output.Articles,
+	return ctx.JSON(http.StatusOK, openapi.ArticlesResponse{
+		Articles: presenter.ConvertArticles(output.Articles),
 	})
 }
 
-func (h *ArticleHandler) GetLatestArticles(c echo.Context) error {
-	limitStr := c.QueryParam("limit")
-
+func (h *ArticleHandler) GetLatestArticles(ctx echo.Context, params openapi.GetLatestArticlesParams) error {
 	limit := 5
-	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
+	if params.Limit != nil {
+		limit = *params.Limit
 	}
 
 	input := usecase.GetLatestArticlesUsecaseInput{
 		Limit: limit,
 	}
 
-	output, err := h.getLatestArticlesUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getLatestArticlesUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get latest articles: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get articles",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get latest articles: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get articles",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"articles": output.Articles,
+	return ctx.JSON(http.StatusOK, openapi.ArticlesResponse{
+		Articles: presenter.ConvertArticles(output.Articles),
 	})
 }
 
-func (h *ArticleHandler) GetArticlesByCategory(c echo.Context) error {
-	slug := c.Param("slug")
+func (h *ArticleHandler) GetArticlesByCategory(ctx echo.Context, slug string, params openapi.GetArticlesByCategoryParams) error {
 	if slug == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error": "Category slug is required",
+		return ctx.JSON(http.StatusBadRequest, openapi.ErrorResponse{
+			Error: "Category slug is required",
 		})
 	}
 
-	pageStr := c.QueryParam("page")
-	limitStr := c.QueryParam("limit")
-
 	page := 1
-	if pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p >= 1 {
-			page = p
-		}
+	if params.Page != nil {
+		page = *params.Page
 	}
 
 	limit := 10
-	if limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
+	if params.Limit != nil {
+		limit = *params.Limit
 	}
 
 	input := usecase.GetArticlesByCategoryUsecaseInput{
@@ -183,17 +164,18 @@ func (h *ArticleHandler) GetArticlesByCategory(c echo.Context) error {
 		Limit:        limit,
 	}
 
-	output, err := h.getArticlesByCategoryUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getArticlesByCategoryUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get articles by category: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get articles",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get articles by category: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get articles",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"articles":   output.Articles,
-		"pagination": output.Pagination,
+	return ctx.JSON(http.StatusOK, openapi.ArticlesResponse{
+		Articles:   presenter.ConvertArticles(output.Articles),
+		Pagination: presenter.ConvertPagination(output.Pagination),
 	})
 }

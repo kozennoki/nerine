@@ -3,6 +3,8 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/kozennoki/nerine/internal/openapi"
+	"github.com/kozennoki/nerine/internal/interfaces/presenter"
 	"github.com/labstack/echo/v4"
 	"github.com/kozennoki/nerine/internal/usecase"
 )
@@ -19,19 +21,20 @@ func NewCategoryHandler(
 	}
 }
 
-func (h *CategoryHandler) GetCategories(c echo.Context) error {
+func (h *CategoryHandler) GetCategories(ctx echo.Context) error {
 	input := usecase.GetCategoriesUsecaseInput{}
 
-	output, err := h.getCategoriesUsecase.Exec(c.Request().Context(), input)
+	output, err := h.getCategoriesUsecase.Exec(ctx.Request().Context(), input)
 	if err != nil {
-		c.Logger().Error("Failed to get categories: ", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":  "Failed to get categories",
-			"detail": err.Error(),
+		ctx.Logger().Error("Failed to get categories: ", err)
+		errorMsg := presenter.ConvertErrorMessage(err)
+		return ctx.JSON(http.StatusInternalServerError, openapi.ErrorResponse{
+			Error:  "Failed to get categories",
+			Detail: &errorMsg,
 		})
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"categories": output.Categories,
+	return ctx.JSON(http.StatusOK, openapi.CategoriesResponse{
+		Categories: presenter.ConvertCategories(output.Categories),
 	})
 }
