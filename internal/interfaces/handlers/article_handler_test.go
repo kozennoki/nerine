@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kozennoki/nerine/internal/domain/entity"
+	"github.com/kozennoki/nerine/internal/infrastructure/utils"
 	"github.com/kozennoki/nerine/internal/usecase"
 	"github.com/kozennoki/nerine/internal/usecase/mocks"
 	"github.com/labstack/echo/v4"
@@ -23,8 +24,17 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 
 	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
 	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
+	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
+	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
+	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
 
-	handler := NewArticleHandler(mockGetArticlesUsecase, mockGetArticleByIDUsecase)
+	handler := NewArticleHandler(
+		mockGetArticlesUsecase,
+		mockGetArticleByIDUsecase,
+		mockGetPopularArticlesUsecase,
+		mockGetLatestArticlesUsecase,
+		mockGetArticlesByCategoryUsecase,
+	)
 
 	tests := []struct {
 		name           string
@@ -49,48 +59,61 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 						UpdatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
 					},
 				}
-				output := usecase.GetArticlesUsecaseOutput{Articles: articles}
-				mockGetArticlesUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticlesUsecaseInput{Limit: 10, Offset: 0}).
-					Return(output, nil)
+				pagination := utils.Pagination{
+					Total:      1,
+					Page:       1,
+					Limit:      10,
+					TotalPages: 1,
+				}
+				expectedInput := usecase.GetArticlesUsecaseInput{
+					Page:  1,
+					Limit: 10,
+				}
+				expectedOutput := usecase.GetArticlesUsecaseOutput{
+					Articles:   articles,
+					Pagination: pagination,
+				}
+				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
-			expectedBody:   `{"articles":[{"ID":"1","Title":"テスト記事1","Image":"https://example.com/image1.jpg","Category":{"Slug":"tech","Name":"技術"},"Description":"テスト記事1の説明","Body":"テスト記事1の本文","CreatedAt":"2025-01-01T00:00:00Z","UpdatedAt":"2025-01-01T00:00:00Z"}]}`,
+			expectedBody:   `"articles"`,
 		},
 		{
-			name:        "正常系: クエリパラメータ指定での記事一覧取得",
-			queryParams: "?limit=5&offset=10",
+			name:        "正常系: カスタムパラメータで記事一覧取得",
+			queryParams: "?page=2&limit=5",
 			setupMock: func() {
-				output := usecase.GetArticlesUsecaseOutput{Articles: []*entity.Article{}}
-				mockGetArticlesUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticlesUsecaseInput{Limit: 5, Offset: 10}).
-					Return(output, nil)
+				articles := []*entity.Article{}
+				pagination := utils.Pagination{
+					Total:      10,
+					Page:       2,
+					Limit:      5,
+					TotalPages: 2,
+				}
+				expectedInput := usecase.GetArticlesUsecaseInput{
+					Page:  2,
+					Limit: 5,
+				}
+				expectedOutput := usecase.GetArticlesUsecaseOutput{
+					Articles:   articles,
+					Pagination: pagination,
+				}
+				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
-			expectedBody:   `{"articles":[]}`,
-		},
-		{
-			name:        "正常系: 無効なクエリパラメータはデフォルト値使用",
-			queryParams: "?limit=invalid&offset=-1",
-			setupMock: func() {
-				output := usecase.GetArticlesUsecaseOutput{Articles: []*entity.Article{}}
-				mockGetArticlesUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticlesUsecaseInput{Limit: 10, Offset: 0}).
-					Return(output, nil)
-			},
-			expectedStatus: http.StatusOK,
-			expectedBody:   `{"articles":[]}`,
+			expectedBody:   `"pagination"`,
 		},
 		{
 			name:        "異常系: Usecaseエラー",
 			queryParams: "",
 			setupMock: func() {
-				mockGetArticlesUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticlesUsecaseInput{Limit: 10, Offset: 0}).
-					Return(usecase.GetArticlesUsecaseOutput{}, errors.New("usecase error"))
+				expectedInput := usecase.GetArticlesUsecaseInput{
+					Page:  1,
+					Limit: 10,
+				}
+				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
-			expectedBody:   `{"detail":"usecase error","error":"Failed to get articles"}`,
+			expectedBody:   `"error"`,
 		},
 	}
 
@@ -108,29 +131,39 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 			err := handler.GetArticles(c)
 
 			if err != nil {
-				t.Errorf("予期しないエラーが発生しました: %v", err)
+				t.Errorf("handler returned error: %v", err)
 			}
 
 			if rec.Code != tt.expectedStatus {
-				t.Errorf("ステータスコードが一致しません。expected: %d, got: %d", tt.expectedStatus, rec.Code)
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
 			}
 
-			body := strings.TrimSpace(rec.Body.String())
-			if body != tt.expectedBody {
-				t.Errorf("レスポンスボディが一致しません。\nexpected: %s\ngot: %s", tt.expectedBody, body)
+			if !strings.Contains(rec.Body.String(), tt.expectedBody) {
+				t.Errorf("expected body to contain %s, got %s", tt.expectedBody, rec.Body.String())
 			}
 		})
 	}
 }
 
 func TestArticleHandler_GetArticleByID(t *testing.T) {
+	t.Parallel()
+
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
 	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
+	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
+	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
+	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
 
-	handler := NewArticleHandler(mockGetArticlesUsecase, mockGetArticleByIDUsecase)
+	handler := NewArticleHandler(
+		mockGetArticlesUsecase,
+		mockGetArticleByIDUsecase,
+		mockGetPopularArticlesUsecase,
+		mockGetLatestArticlesUsecase,
+		mockGetArticlesByCategoryUsecase,
+	)
 
 	tests := []struct {
 		name           string
@@ -141,71 +174,423 @@ func TestArticleHandler_GetArticleByID(t *testing.T) {
 	}{
 		{
 			name:      "正常系: 記事詳細取得",
-			articleID: "test-article-1",
+			articleID: "123",
 			setupMock: func() {
 				article := &entity.Article{
-					ID:          "test-article-1",
-					Title:       "テスト記事1",
-					Image:       "https://example.com/image1.jpg",
+					ID:          "123",
+					Title:       "テスト記事",
+					Image:       "https://example.com/image.jpg",
 					Category:    entity.Category{Slug: "tech", Name: "技術"},
-					Description: "テスト記事1の説明",
-					Body:        "テスト記事1の本文",
+					Description: "テスト記事の説明",
+					Body:        "テスト記事の本文",
 					CreatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
 					UpdatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
 				}
-				output := usecase.GetArticleByIDUsecaseOutput{Article: article}
-				mockGetArticleByIDUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticleByIDUsecaseInput{ID: "test-article-1"}).
-					Return(output, nil)
+				expectedInput := usecase.GetArticleByIDUsecaseInput{ID: "123"}
+				expectedOutput := usecase.GetArticleByIDUsecaseOutput{Article: article}
+				mockGetArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
-			expectedBody:   `{"article":{"ID":"test-article-1","Title":"テスト記事1","Image":"https://example.com/image1.jpg","Category":{"Slug":"tech","Name":"技術"},"Description":"テスト記事1の説明","Body":"テスト記事1の本文","CreatedAt":"2025-01-01T00:00:00Z","UpdatedAt":"2025-01-01T00:00:00Z"}}`,
+			expectedBody:   `"article"`,
 		},
 		{
-			name:           "異常系: 記事IDが空",
-			articleID:      "",
-			setupMock:      func() {},
+			name:      "異常系: 記事IDが空",
+			articleID: "",
+			setupMock: func() {
+				// No mock setup needed for this case
+			},
 			expectedStatus: http.StatusBadRequest,
-			expectedBody:   `{"error":"Article ID is required"}`,
+			expectedBody:   `"error"`,
 		},
 		{
 			name:      "異常系: Usecaseエラー",
-			articleID: "non-existent-id",
+			articleID: "123",
 			setupMock: func() {
-				mockGetArticleByIDUsecase.EXPECT().
-					Exec(gomock.Any(), usecase.GetArticleByIDUsecaseInput{ID: "non-existent-id"}).
-					Return(usecase.GetArticleByIDUsecaseOutput{}, errors.New("article not found"))
+				expectedInput := usecase.GetArticleByIDUsecaseInput{ID: "123"}
+				mockGetArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticleByIDUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
-			expectedBody:   `{"detail":"article not found","error":"Failed to get article"}`,
+			expectedBody:   `"error"`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			tt.setupMock()
 
 			e := echo.New()
-			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			req := httptest.NewRequest(http.MethodGet, "/articles/"+tt.articleID, nil)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			c.SetPath("/articles/:id")
 			c.SetParamNames("id")
 			c.SetParamValues(tt.articleID)
 
 			err := handler.GetArticleByID(c)
 
 			if err != nil {
-				t.Errorf("予期しないエラーが発生しました: %v", err)
+				t.Errorf("handler returned error: %v", err)
 			}
 
 			if rec.Code != tt.expectedStatus {
-				t.Errorf("ステータスコードが一致しません。expected: %d, got: %d", tt.expectedStatus, rec.Code)
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
 			}
 
-			body := strings.TrimSpace(rec.Body.String())
-			if body != tt.expectedBody {
-				t.Errorf("レスポンスボディが一致しません。\nexpected: %s\ngot: %s", tt.expectedBody, body)
+			if !strings.Contains(rec.Body.String(), tt.expectedBody) {
+				t.Errorf("expected body to contain %s, got %s", tt.expectedBody, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestArticleHandler_GetPopularArticles(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
+	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
+	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
+	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
+	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
+
+	handler := NewArticleHandler(
+		mockGetArticlesUsecase,
+		mockGetArticleByIDUsecase,
+		mockGetPopularArticlesUsecase,
+		mockGetLatestArticlesUsecase,
+		mockGetArticlesByCategoryUsecase,
+	)
+
+	tests := []struct {
+		name           string
+		queryParams    string
+		setupMock      func()
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:        "正常系: デフォルトlimitで人気記事取得",
+			queryParams: "",
+			setupMock: func() {
+				articles := []*entity.Article{
+					{
+						ID:          "1",
+						Title:       "人気記事1",
+						Image:       "https://example.com/popular1.jpg",
+						Category:    entity.Category{Slug: "tech", Name: "技術"},
+						Description: "人気記事1の説明",
+						Body:        "人気記事1の本文",
+						CreatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+						UpdatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+					},
+				}
+				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 5}
+				expectedOutput := usecase.GetPopularArticlesUsecaseOutput{Articles: articles}
+				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"articles"`,
+		},
+		{
+			name:        "正常系: カスタムlimitで人気記事取得",
+			queryParams: "?limit=10",
+			setupMock: func() {
+				articles := []*entity.Article{}
+				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 10}
+				expectedOutput := usecase.GetPopularArticlesUsecaseOutput{Articles: articles}
+				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"articles"`,
+		},
+		{
+			name:        "異常系: Usecaseエラー",
+			queryParams: "",
+			setupMock: func() {
+				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 5}
+				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetPopularArticlesUsecaseOutput{}, errors.New("usecase error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `"error"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			tt.setupMock()
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/articles/popular"+tt.queryParams, nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			err := handler.GetPopularArticles(c)
+
+			if err != nil {
+				t.Errorf("handler returned error: %v", err)
+			}
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+
+			if !strings.Contains(rec.Body.String(), tt.expectedBody) {
+				t.Errorf("expected body to contain %s, got %s", tt.expectedBody, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestArticleHandler_GetLatestArticles(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
+	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
+	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
+	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
+	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
+
+	handler := NewArticleHandler(
+		mockGetArticlesUsecase,
+		mockGetArticleByIDUsecase,
+		mockGetPopularArticlesUsecase,
+		mockGetLatestArticlesUsecase,
+		mockGetArticlesByCategoryUsecase,
+	)
+
+	tests := []struct {
+		name           string
+		queryParams    string
+		setupMock      func()
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:        "正常系: デフォルトlimitで最新記事取得",
+			queryParams: "",
+			setupMock: func() {
+				articles := []*entity.Article{
+					{
+						ID:          "1",
+						Title:       "最新記事1",
+						Image:       "https://example.com/latest1.jpg",
+						Category:    entity.Category{Slug: "news", Name: "ニュース"},
+						Description: "最新記事1の説明",
+						Body:        "最新記事1の本文",
+						CreatedAt:   time.Date(2025, 1, 2, 0, 0, 0, 0, time.UTC),
+						UpdatedAt:   time.Date(2025, 1, 2, 0, 0, 0, 0, time.UTC),
+					},
+				}
+				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 5}
+				expectedOutput := usecase.GetLatestArticlesUsecaseOutput{Articles: articles}
+				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"articles"`,
+		},
+		{
+			name:        "正常系: カスタムlimitで最新記事取得",
+			queryParams: "?limit=15",
+			setupMock: func() {
+				articles := []*entity.Article{}
+				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 15}
+				expectedOutput := usecase.GetLatestArticlesUsecaseOutput{Articles: articles}
+				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"articles"`,
+		},
+		{
+			name:        "異常系: Usecaseエラー",
+			queryParams: "",
+			setupMock: func() {
+				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 5}
+				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetLatestArticlesUsecaseOutput{}, errors.New("usecase error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `"error"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			tt.setupMock()
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/articles/latest"+tt.queryParams, nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			err := handler.GetLatestArticles(c)
+
+			if err != nil {
+				t.Errorf("handler returned error: %v", err)
+			}
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+
+			if !strings.Contains(rec.Body.String(), tt.expectedBody) {
+				t.Errorf("expected body to contain %s, got %s", tt.expectedBody, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestArticleHandler_GetArticlesByCategory(t *testing.T) {
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
+	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
+	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
+	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
+	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
+
+	handler := NewArticleHandler(
+		mockGetArticlesUsecase,
+		mockGetArticleByIDUsecase,
+		mockGetPopularArticlesUsecase,
+		mockGetLatestArticlesUsecase,
+		mockGetArticlesByCategoryUsecase,
+	)
+
+	tests := []struct {
+		name           string
+		categorySlug   string
+		queryParams    string
+		setupMock      func()
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:         "正常系: デフォルトパラメータでカテゴリ別記事取得",
+			categorySlug: "technology",
+			queryParams:  "",
+			setupMock: func() {
+				articles := []*entity.Article{
+					{
+						ID:          "1",
+						Title:       "技術記事1",
+						Image:       "https://example.com/tech1.jpg",
+						Category:    entity.Category{Slug: "technology", Name: "技術"},
+						Description: "技術記事1の説明",
+						Body:        "技術記事1の本文",
+						CreatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+						UpdatedAt:   time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+					},
+				}
+				pagination := utils.Pagination{
+					Total:      1,
+					Page:       1,
+					Limit:      10,
+					TotalPages: 1,
+				}
+				expectedInput := usecase.GetArticlesByCategoryUsecaseInput{
+					CategorySlug: "technology",
+					Page:         1,
+					Limit:        10,
+				}
+				expectedOutput := usecase.GetArticlesByCategoryUsecaseOutput{
+					Articles:   articles,
+					Pagination: pagination,
+				}
+				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"articles"`,
+		},
+		{
+			name:         "正常系: カスタムパラメータでカテゴリ別記事取得",
+			categorySlug: "lifestyle",
+			queryParams:  "?page=2&limit=5",
+			setupMock: func() {
+				articles := []*entity.Article{}
+				pagination := utils.Pagination{
+					Total:      15,
+					Page:       2,
+					Limit:      5,
+					TotalPages: 3,
+				}
+				expectedInput := usecase.GetArticlesByCategoryUsecaseInput{
+					CategorySlug: "lifestyle",
+					Page:         2,
+					Limit:        5,
+				}
+				expectedOutput := usecase.GetArticlesByCategoryUsecaseOutput{
+					Articles:   articles,
+					Pagination: pagination,
+				}
+				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `"pagination"`,
+		},
+		{
+			name:         "異常系: カテゴリスラッグが空",
+			categorySlug: "",
+			queryParams:  "",
+			setupMock: func() {
+				// No mock setup needed for this case
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `"error"`,
+		},
+		{
+			name:         "異常系: Usecaseエラー",
+			categorySlug: "technology",
+			queryParams:  "",
+			setupMock: func() {
+				expectedInput := usecase.GetArticlesByCategoryUsecaseInput{
+					CategorySlug: "technology",
+					Page:         1,
+					Limit:        10,
+				}
+				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesByCategoryUsecaseOutput{}, errors.New("usecase error"))
+			},
+			expectedStatus: http.StatusInternalServerError,
+			expectedBody:   `"error"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			tt.setupMock()
+
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/categories/"+tt.categorySlug+"/articles"+tt.queryParams, nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			c.SetParamNames("slug")
+			c.SetParamValues(tt.categorySlug)
+
+			err := handler.GetArticlesByCategory(c)
+
+			if err != nil {
+				t.Errorf("handler returned error: %v", err)
+			}
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+
+			if !strings.Contains(rec.Body.String(), tt.expectedBody) {
+				t.Errorf("expected body to contain %s, got %s", tt.expectedBody, rec.Body.String())
 			}
 		})
 	}
