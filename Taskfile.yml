@@ -49,6 +49,7 @@ tasks:
       - ~/go/bin/mockgen -source=internal/usecase/get_popular_articles.go -destination=internal/usecase/mocks/mock_get_popular_articles_usecase.go -package=mocks
       - ~/go/bin/mockgen -source=internal/usecase/get_latest_articles.go -destination=internal/usecase/mocks/mock_get_latest_articles_usecase.go -package=mocks
       - ~/go/bin/mockgen -source=internal/usecase/get_articles_by_category.go -destination=internal/usecase/mocks/mock_get_articles_by_category_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_zenn_articles.go -destination=internal/usecase/mocks/mock_get_zenn_articles_usecase.go -package=mocks
 
   generate-openapi:
     desc: Generate Go code from OpenAPI specification

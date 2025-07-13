@@ -10,6 +10,7 @@ type Config struct {
 	MicroCMSAPIKey    string
 	MicroCMSServiceID string
 	NerineAPIKey      string
+	ZennUsername      string
 }
 
 func Load() (*Config, error) {
@@ -18,6 +19,7 @@ func Load() (*Config, error) {
 		MicroCMSAPIKey:    os.Getenv("MICROCMS_API_KEY"),
 		MicroCMSServiceID: os.Getenv("MICROCMS_SERVICE_ID"),
 		NerineAPIKey:      os.Getenv("NERINE_API_KEY"),
+		ZennUsername:      getEnvOrDefault("ZENN_USERNAME", "kozennoki"),
 	}
 
 	if err := cfg.validate(); err != nil {
