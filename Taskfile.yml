@@ -36,7 +36,7 @@ tasks:
 
   generate-mocks:
     desc: Generate mocks for all interfaces
-    aliases: [g]
+    aliases: [gen-mocks]
     cmds:
       # repository
       - ~/go/bin/mockgen -source=internal/domain/repository/article.go -destination=internal/domain/repository/mocks/mock_article_repository.go -package=mocks
@@ -49,6 +49,12 @@ tasks:
       - ~/go/bin/mockgen -source=internal/usecase/get_popular_articles.go -destination=internal/usecase/mocks/mock_get_popular_articles_usecase.go -package=mocks
       - ~/go/bin/mockgen -source=internal/usecase/get_latest_articles.go -destination=internal/usecase/mocks/mock_get_latest_articles_usecase.go -package=mocks
       - ~/go/bin/mockgen -source=internal/usecase/get_articles_by_category.go -destination=internal/usecase/mocks/mock_get_articles_by_category_usecase.go -package=mocks
+
+  generate-openapi:
+    desc: Generate Go code from OpenAPI specification
+    aliases: [gen-api]
+    cmds:
+      - ~/go/bin/oapi-codegen -config config/codegen.yaml schema/openapi.yaml
 
   coverage:
     desc: Run tests and generate coverage report
