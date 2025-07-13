@@ -39,34 +39,22 @@ func (u *getArticlesByCategory) Exec(
 	ctx context.Context,
 	input GetArticlesByCategoryUsecaseInput,
 ) (GetArticlesByCategoryUsecaseOutput, error) {
-	page := input.Page
-	if page < 1 {
-		page = 1
-	}
-
-	limit := input.Limit
-	if limit <= 0 {
-		limit = 10 // default limit
-	}
-	if limit > 100 {
-		limit = 100 // max limit as per OpenAPI spec
-	}
-
-	offset := utils.ConvertPageToOffset(page, limit)
-
 	// Get total count for pagination
 	total, err := u.repo.CountArticlesByCategory(ctx, input.CategorySlug)
 	if err != nil {
 		return GetArticlesByCategoryUsecaseOutput{}, err
 	}
 
+	// Validate pagination parameters
+	limit, offset, pagination := BuildPagination(
+		input.Page, input.Limit, 10, 100, total,
+	)
+
 	// Get articles
 	articles, err := u.repo.GetArticlesByCategory(ctx, input.CategorySlug, limit, offset)
 	if err != nil {
 		return GetArticlesByCategoryUsecaseOutput{}, err
 	}
-
-	pagination := utils.NewPagination(total, page, limit)
 
 	return GetArticlesByCategoryUsecaseOutput{
 		Articles:   articles,

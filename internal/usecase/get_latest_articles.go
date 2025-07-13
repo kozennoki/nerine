@@ -35,13 +35,7 @@ func (u *getLatestArticles) Exec(
 	ctx context.Context,
 	input GetLatestArticlesUsecaseInput,
 ) (GetLatestArticlesUsecaseOutput, error) {
-	limit := input.Limit
-	if limit <= 0 {
-		limit = 5 // default limit for latest articles
-	}
-	if limit > 20 {
-		limit = 20 // max limit as per OpenAPI spec
-	}
+	limit := ValidateLimit(input.Limit, 5, 20)
 
 	articles, err := u.repo.GetLatestArticles(ctx, limit)
 	if err != nil {
