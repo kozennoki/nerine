@@ -60,7 +60,7 @@ tasks:
     desc: Run tests and generate coverage report
     aliases: [cov]
     cmds:
-      - go test -coverprofile=coverage/coverage.out ./... -coverpkg=$(go list ./... | grep -v /mocks | tr '\n' ',')
+      - go test -coverprofile=coverage/coverage.out ./... -coverpkg=$(go list ./... | grep -v -E '/mocks|/openapi' | tr '\n' ',')
       - go tool cover -func=coverage/coverage.out
       - go tool cover -html=coverage/coverage.out -o coverage/coverage.html
       - echo "Coverage report saved to coverage.html"
