@@ -8,9 +8,7 @@ import (
 )
 
 type DIContainer struct {
-	APIHandler      *handlers.APIHandler
-	ArticleHandler  *handlers.ArticleHandler
-	CategoryHandler *handlers.CategoryHandler
+	APIHandler *handlers.APIHandler
 }
 
 func NewDIContainer(cfg *config.Config) *DIContainer {
@@ -27,14 +25,6 @@ func NewDIContainer(cfg *config.Config) *DIContainer {
 	getCategoriesUsecase := usecase.NewGetCategories(categoryRepo)
 
 	// Handler
-	articleHandler := handlers.NewArticleHandler(
-		getArticlesUsecase,
-		getArticleByIDUsecase,
-		getPopularArticlesUsecase,
-		getLatestArticlesUsecase,
-		getArticlesByCategoryUsecase,
-	)
-	categoryHandler := handlers.NewCategoryHandler(getCategoriesUsecase)
 	apiHandler := handlers.NewAPIHandler(
 		getArticlesUsecase,
 		getArticleByIDUsecase,
@@ -45,8 +35,6 @@ func NewDIContainer(cfg *config.Config) *DIContainer {
 	)
 
 	return &DIContainer{
-		APIHandler:      apiHandler,
-		ArticleHandler:  articleHandler,
-		CategoryHandler: categoryHandler,
+		APIHandler: apiHandler,
 	}
 }

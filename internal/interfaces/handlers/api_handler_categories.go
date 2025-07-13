@@ -5,23 +5,11 @@ import (
 
 	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/kozennoki/nerine/internal/interfaces/presenter"
-	"github.com/labstack/echo/v4"
 	"github.com/kozennoki/nerine/internal/usecase"
+	"github.com/labstack/echo/v4"
 )
 
-type CategoryHandler struct {
-	getCategoriesUsecase usecase.GetCategoriesUsecase
-}
-
-func NewCategoryHandler(
-	getCategoriesUsecase usecase.GetCategoriesUsecase,
-) *CategoryHandler {
-	return &CategoryHandler{
-		getCategoriesUsecase: getCategoriesUsecase,
-	}
-}
-
-func (h *CategoryHandler) GetCategories(ctx echo.Context) error {
+func (h *APIHandler) GetCategories(ctx echo.Context) error {
 	input := usecase.GetCategoriesUsecaseInput{}
 
 	output, err := h.getCategoriesUsecase.Exec(ctx.Request().Context(), input)

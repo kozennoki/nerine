@@ -9,31 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ArticleHandler struct {
-	getArticlesUsecase           usecase.GetArticlesUsecase
-	getArticleByIDUsecase        usecase.GetArticleByIDUsecase
-	getPopularArticlesUsecase    usecase.GetPopularArticlesUsecase
-	getLatestArticlesUsecase     usecase.GetLatestArticlesUsecase
-	getArticlesByCategoryUsecase usecase.GetArticlesByCategoryUsecase
-}
-
-func NewArticleHandler(
-	getArticlesUsecase usecase.GetArticlesUsecase,
-	getArticleByIDUsecase usecase.GetArticleByIDUsecase,
-	getPopularArticlesUsecase usecase.GetPopularArticlesUsecase,
-	getLatestArticlesUsecase usecase.GetLatestArticlesUsecase,
-	getArticlesByCategoryUsecase usecase.GetArticlesByCategoryUsecase,
-) *ArticleHandler {
-	return &ArticleHandler{
-		getArticlesUsecase:           getArticlesUsecase,
-		getArticleByIDUsecase:        getArticleByIDUsecase,
-		getPopularArticlesUsecase:    getPopularArticlesUsecase,
-		getLatestArticlesUsecase:     getLatestArticlesUsecase,
-		getArticlesByCategoryUsecase: getArticlesByCategoryUsecase,
-	}
-}
-
-func (h *ArticleHandler) GetArticles(ctx echo.Context, params openapi.GetArticlesParams) error {
+func (h *APIHandler) GetArticles(ctx echo.Context, params openapi.GetArticlesParams) error {
 	page := 1
 	if params.Page != nil {
 		page = *params.Page
@@ -65,7 +41,7 @@ func (h *ArticleHandler) GetArticles(ctx echo.Context, params openapi.GetArticle
 	})
 }
 
-func (h *ArticleHandler) GetArticleById(ctx echo.Context, id string) error {
+func (h *APIHandler) GetArticleById(ctx echo.Context, id string) error {
 	if id == "" {
 		return ctx.JSON(http.StatusBadRequest, openapi.ErrorResponse{
 			Error: "Article ID is required",
@@ -91,7 +67,7 @@ func (h *ArticleHandler) GetArticleById(ctx echo.Context, id string) error {
 	})
 }
 
-func (h *ArticleHandler) GetPopularArticles(ctx echo.Context, params openapi.GetPopularArticlesParams) error {
+func (h *APIHandler) GetPopularArticles(ctx echo.Context, params openapi.GetPopularArticlesParams) error {
 	limit := 5
 	if params.Limit != nil {
 		limit = *params.Limit
@@ -116,7 +92,7 @@ func (h *ArticleHandler) GetPopularArticles(ctx echo.Context, params openapi.Get
 	})
 }
 
-func (h *ArticleHandler) GetLatestArticles(ctx echo.Context, params openapi.GetLatestArticlesParams) error {
+func (h *APIHandler) GetLatestArticles(ctx echo.Context, params openapi.GetLatestArticlesParams) error {
 	limit := 5
 	if params.Limit != nil {
 		limit = *params.Limit
@@ -141,7 +117,7 @@ func (h *ArticleHandler) GetLatestArticles(ctx echo.Context, params openapi.GetL
 	})
 }
 
-func (h *ArticleHandler) GetArticlesByCategory(ctx echo.Context, slug string, params openapi.GetArticlesByCategoryParams) error {
+func (h *APIHandler) GetArticlesByCategory(ctx echo.Context, slug string, params openapi.GetArticlesByCategoryParams) error {
 	if slug == "" {
 		return ctx.JSON(http.StatusBadRequest, openapi.ErrorResponse{
 			Error: "Category slug is required",
