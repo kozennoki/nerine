@@ -16,25 +16,43 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
+// testArticleHandlerMocks holds all mocks for ArticleHandler testing
+type testArticleHandlerMocks struct {
+	getArticlesUsecase           *mocks.MockGetArticlesUsecase
+	getArticleByIDUsecase        *mocks.MockGetArticleByIDUsecase
+	getPopularArticlesUsecase    *mocks.MockGetPopularArticlesUsecase
+	getLatestArticlesUsecase     *mocks.MockGetLatestArticlesUsecase
+	getArticlesByCategoryUsecase *mocks.MockGetArticlesByCategoryUsecase
+}
+
+// createTestArticleHandler creates ArticleHandler with mocks for testing
+func createTestArticleHandler(ctrl *gomock.Controller) (*ArticleHandler, *testArticleHandlerMocks) {
+	mocks := &testArticleHandlerMocks{
+		getArticlesUsecase:           mocks.NewMockGetArticlesUsecase(ctrl),
+		getArticleByIDUsecase:        mocks.NewMockGetArticleByIDUsecase(ctrl),
+		getPopularArticlesUsecase:    mocks.NewMockGetPopularArticlesUsecase(ctrl),
+		getLatestArticlesUsecase:     mocks.NewMockGetLatestArticlesUsecase(ctrl),
+		getArticlesByCategoryUsecase: mocks.NewMockGetArticlesByCategoryUsecase(ctrl),
+	}
+
+	handler := NewArticleHandler(
+		mocks.getArticlesUsecase,
+		mocks.getArticleByIDUsecase,
+		mocks.getPopularArticlesUsecase,
+		mocks.getLatestArticlesUsecase,
+		mocks.getArticlesByCategoryUsecase,
+	)
+
+	return handler, mocks
+}
+
 func TestArticleHandler_GetArticles(t *testing.T) {
 	t.Parallel()
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
-	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
-	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
-	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
-	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
-
-	handler := NewArticleHandler(
-		mockGetArticlesUsecase,
-		mockGetArticleByIDUsecase,
-		mockGetPopularArticlesUsecase,
-		mockGetLatestArticlesUsecase,
-		mockGetArticlesByCategoryUsecase,
-	)
+	handler, testMocks := createTestArticleHandler(ctrl)
 
 	tests := []struct {
 		name           string
@@ -73,7 +91,7 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 					Articles:   articles,
 					Pagination: pagination,
 				}
-				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -97,7 +115,7 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 					Articles:   articles,
 					Pagination: pagination,
 				}
-				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"pagination"`,
@@ -110,7 +128,7 @@ func TestArticleHandler_GetArticles(t *testing.T) {
 					Page:  1,
 					Limit: 10,
 				}
-				mockGetArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesUsecaseOutput{}, errors.New("usecase error"))
+				testMocks.getArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `"error"`,
@@ -151,19 +169,7 @@ func TestArticleHandler_GetArticleByID(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
-	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
-	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
-	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
-	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
-
-	handler := NewArticleHandler(
-		mockGetArticlesUsecase,
-		mockGetArticleByIDUsecase,
-		mockGetPopularArticlesUsecase,
-		mockGetLatestArticlesUsecase,
-		mockGetArticlesByCategoryUsecase,
-	)
+	handler, testMocks := createTestArticleHandler(ctrl)
 
 	tests := []struct {
 		name           string
@@ -188,7 +194,7 @@ func TestArticleHandler_GetArticleByID(t *testing.T) {
 				}
 				expectedInput := usecase.GetArticleByIDUsecaseInput{ID: "123"}
 				expectedOutput := usecase.GetArticleByIDUsecaseOutput{Article: article}
-				mockGetArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"article"`,
@@ -207,7 +213,7 @@ func TestArticleHandler_GetArticleByID(t *testing.T) {
 			articleID: "123",
 			setupMock: func() {
 				expectedInput := usecase.GetArticleByIDUsecaseInput{ID: "123"}
-				mockGetArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticleByIDUsecaseOutput{}, errors.New("usecase error"))
+				testMocks.getArticleByIDUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticleByIDUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `"error"`,
@@ -250,19 +256,7 @@ func TestArticleHandler_GetPopularArticles(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
-	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
-	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
-	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
-	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
-
-	handler := NewArticleHandler(
-		mockGetArticlesUsecase,
-		mockGetArticleByIDUsecase,
-		mockGetPopularArticlesUsecase,
-		mockGetLatestArticlesUsecase,
-		mockGetArticlesByCategoryUsecase,
-	)
+	handler, testMocks := createTestArticleHandler(ctrl)
 
 	tests := []struct {
 		name           string
@@ -289,7 +283,7 @@ func TestArticleHandler_GetPopularArticles(t *testing.T) {
 				}
 				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 5}
 				expectedOutput := usecase.GetPopularArticlesUsecaseOutput{Articles: articles}
-				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -301,7 +295,7 @@ func TestArticleHandler_GetPopularArticles(t *testing.T) {
 				articles := []*entity.Article{}
 				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 10}
 				expectedOutput := usecase.GetPopularArticlesUsecaseOutput{Articles: articles}
-				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -311,7 +305,7 @@ func TestArticleHandler_GetPopularArticles(t *testing.T) {
 			queryParams: "",
 			setupMock: func() {
 				expectedInput := usecase.GetPopularArticlesUsecaseInput{Limit: 5}
-				mockGetPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetPopularArticlesUsecaseOutput{}, errors.New("usecase error"))
+				testMocks.getPopularArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetPopularArticlesUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `"error"`,
@@ -352,19 +346,7 @@ func TestArticleHandler_GetLatestArticles(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
-	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
-	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
-	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
-	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
-
-	handler := NewArticleHandler(
-		mockGetArticlesUsecase,
-		mockGetArticleByIDUsecase,
-		mockGetPopularArticlesUsecase,
-		mockGetLatestArticlesUsecase,
-		mockGetArticlesByCategoryUsecase,
-	)
+	handler, testMocks := createTestArticleHandler(ctrl)
 
 	tests := []struct {
 		name           string
@@ -391,7 +373,7 @@ func TestArticleHandler_GetLatestArticles(t *testing.T) {
 				}
 				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 5}
 				expectedOutput := usecase.GetLatestArticlesUsecaseOutput{Articles: articles}
-				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -403,7 +385,7 @@ func TestArticleHandler_GetLatestArticles(t *testing.T) {
 				articles := []*entity.Article{}
 				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 15}
 				expectedOutput := usecase.GetLatestArticlesUsecaseOutput{Articles: articles}
-				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -413,7 +395,7 @@ func TestArticleHandler_GetLatestArticles(t *testing.T) {
 			queryParams: "",
 			setupMock: func() {
 				expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 5}
-				mockGetLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetLatestArticlesUsecaseOutput{}, errors.New("usecase error"))
+				testMocks.getLatestArticlesUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetLatestArticlesUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `"error"`,
@@ -454,19 +436,7 @@ func TestArticleHandler_GetArticlesByCategory(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockGetArticlesUsecase := mocks.NewMockGetArticlesUsecase(ctrl)
-	mockGetArticleByIDUsecase := mocks.NewMockGetArticleByIDUsecase(ctrl)
-	mockGetPopularArticlesUsecase := mocks.NewMockGetPopularArticlesUsecase(ctrl)
-	mockGetLatestArticlesUsecase := mocks.NewMockGetLatestArticlesUsecase(ctrl)
-	mockGetArticlesByCategoryUsecase := mocks.NewMockGetArticlesByCategoryUsecase(ctrl)
-
-	handler := NewArticleHandler(
-		mockGetArticlesUsecase,
-		mockGetArticleByIDUsecase,
-		mockGetPopularArticlesUsecase,
-		mockGetLatestArticlesUsecase,
-		mockGetArticlesByCategoryUsecase,
-	)
+	handler, testMocks := createTestArticleHandler(ctrl)
 
 	tests := []struct {
 		name           string
@@ -508,7 +478,7 @@ func TestArticleHandler_GetArticlesByCategory(t *testing.T) {
 					Articles:   articles,
 					Pagination: pagination,
 				}
-				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"articles"`,
@@ -534,7 +504,7 @@ func TestArticleHandler_GetArticlesByCategory(t *testing.T) {
 					Articles:   articles,
 					Pagination: pagination,
 				}
-				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
+				testMocks.getArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(expectedOutput, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody:   `"pagination"`,
@@ -559,7 +529,7 @@ func TestArticleHandler_GetArticlesByCategory(t *testing.T) {
 					Page:         1,
 					Limit:        10,
 				}
-				mockGetArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesByCategoryUsecaseOutput{}, errors.New("usecase error"))
+				testMocks.getArticlesByCategoryUsecase.EXPECT().Exec(gomock.Any(), expectedInput).Return(usecase.GetArticlesByCategoryUsecaseOutput{}, errors.New("usecase error"))
 			},
 			expectedStatus: http.StatusInternalServerError,
 			expectedBody:   `"error"`,
