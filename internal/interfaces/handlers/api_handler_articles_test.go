@@ -203,6 +203,14 @@ func TestAPIHandler_GetPopularArticles(t *testing.T) {
 			mockError:      nil,
 			expectedStatus: http.StatusOK,
 		},
+		{
+			name:           "Error from usecase",
+			limit:          nil,
+			expectedInput:  usecase.GetPopularArticlesUsecaseInput{Limit: 5},
+			mockOutput:     usecase.GetPopularArticlesUsecaseOutput{},
+			mockError:      errors.New("database error"),
+			expectedStatus: http.StatusInternalServerError,
+		},
 	}
 
 	for _, tt := range tests {
@@ -240,34 +248,70 @@ func TestAPIHandler_GetLatestArticles(t *testing.T) {
 
 	handler, mocks := CreateTestAPIHandler(ctrl)
 
-	limit := IntPtr(3)
-	expectedInput := usecase.GetLatestArticlesUsecaseInput{Limit: 3}
-	mockOutput := usecase.GetLatestArticlesUsecaseOutput{
-		Articles: []*entity.Article{
-			{ID: "1", Title: "Latest Article", CreatedAt: time.Now()},
+	tests := []struct {
+		name           string
+		limit          *int
+		expectedInput  usecase.GetLatestArticlesUsecaseInput
+		mockOutput     usecase.GetLatestArticlesUsecaseOutput
+		mockError      error
+		expectedStatus int
+	}{
+		{
+			name:          "Success with default limit",
+			limit:         nil,
+			expectedInput: usecase.GetLatestArticlesUsecaseInput{Limit: 5},
+			mockOutput: usecase.GetLatestArticlesUsecaseOutput{
+				Articles: []*entity.Article{
+					{ID: "1", Title: "Latest Article", CreatedAt: time.Now()},
+				},
+			},
+			mockError:      nil,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:          "Success with custom limit",
+			limit:         IntPtr(3),
+			expectedInput: usecase.GetLatestArticlesUsecaseInput{Limit: 3},
+			mockOutput: usecase.GetLatestArticlesUsecaseOutput{
+				Articles: []*entity.Article{},
+			},
+			mockError:      nil,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Error from usecase",
+			limit:          nil,
+			expectedInput:  usecase.GetLatestArticlesUsecaseInput{Limit: 5},
+			mockOutput:     usecase.GetLatestArticlesUsecaseOutput{},
+			mockError:      errors.New("database error"),
+			expectedStatus: http.StatusInternalServerError,
 		},
 	}
 
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/articles/latest", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/articles/latest", nil)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
 
-	params := openapi.GetLatestArticlesParams{
-		Limit: limit,
-	}
+			params := openapi.GetLatestArticlesParams{
+				Limit: tt.limit,
+			}
 
-	mocks.GetLatestArticlesUsecase.EXPECT().
-		Exec(gomock.Any(), expectedInput).
-		Return(mockOutput, nil)
+			mocks.GetLatestArticlesUsecase.EXPECT().
+				Exec(gomock.Any(), tt.expectedInput).
+				Return(tt.mockOutput, tt.mockError)
 
-	err := handler.GetLatestArticles(c, params)
+			err := handler.GetLatestArticles(c, params)
 
-	if err != nil {
-		t.Errorf("GetLatestArticles() error = %v", err)
-	}
-	if rec.Code != http.StatusOK {
-		t.Errorf("GetLatestArticles() status = %v, want %v", rec.Code, http.StatusOK)
+			if err != nil {
+				t.Errorf("GetLatestArticles() error = %v", err)
+			}
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("GetLatestArticles() status = %v, want %v", rec.Code, tt.expectedStatus)
+			}
+		})
 	}
 }
 
@@ -312,6 +356,20 @@ func TestAPIHandler_GetArticlesByCategory(t *testing.T) {
 			name:           "Empty slug",
 			slug:           "",
 			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:  "Error from usecase",
+			slug:  "tech",
+			page:  IntPtr(1),
+			limit: IntPtr(5),
+			expectedInput: usecase.GetArticlesByCategoryUsecaseInput{
+				CategorySlug: "tech",
+				Page:         1,
+				Limit:        5,
+			},
+			mockOutput:     usecase.GetArticlesByCategoryUsecaseOutput{},
+			mockError:      errors.New("database error"),
+			expectedStatus: http.StatusInternalServerError,
 		},
 	}
 
