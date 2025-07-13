@@ -31,7 +31,10 @@ func NewGetArticleByID(
 	}
 }
 
-func (u *getArticleByID) Exec(ctx context.Context, input GetArticleByIDUsecaseInput) (GetArticleByIDUsecaseOutput, error) {
+func (u *getArticleByID) Exec(
+	ctx context.Context,
+	input GetArticleByIDUsecaseInput,
+) (GetArticleByIDUsecaseOutput, error) {
 	article, err := u.articleRepo.GetArticleByID(ctx, input.ID)
 	if err != nil {
 		return GetArticleByIDUsecaseOutput{}, err

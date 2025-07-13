@@ -13,18 +13,42 @@ tasks:
     cmds:
       - go test ./...
 
+  test-verbose:
+    desc: Run all tests with verbose output
+    aliases: [tv]
+    cmds:
+      - go test -v ./...
+
+  test-unit:
+    desc: Run unit tests for specific package
+    cmds:
+      - go test -v {{.PACKAGE}}
+
+  test-utils:
+    desc: Test pagination utilities
+    cmds:
+      - go test -v ./internal/infrastructure/utils
+
+  test-usecase:
+    desc: Test all usecases
+    cmds:
+      - go test -v ./internal/usecase
+
   generate-mocks:
     desc: Generate mocks for all interfaces
     aliases: [g]
     cmds:
       # repository
-      - mockgen -source=internal/domain/repository/article.go -destination=internal/domain/repository/mocks/mock_article_repository.go -package=mocks
-      - mockgen -source=internal/domain/repository/category.go -destination=internal/domain/repository/mocks/mock_category_repository.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/domain/repository/article.go -destination=internal/domain/repository/mocks/mock_article_repository.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/domain/repository/category.go -destination=internal/domain/repository/mocks/mock_category_repository.go -package=mocks
 
       # usecase
-      - mockgen -source=internal/usecase/get_articles.go -destination=internal/usecase/mocks/mock_get_articles_usecase.go -package=mocks
-      - mockgen -source=internal/usecase/get_article_by_id.go -destination=internal/usecase/mocks/mock_get_article_by_id_usecase.go -package=mocks
-      - mockgen -source=internal/usecase/get_categories.go -destination=internal/usecase/mocks/mock_get_categories_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_articles.go -destination=internal/usecase/mocks/mock_get_articles_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_article_by_id.go -destination=internal/usecase/mocks/mock_get_article_by_id_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_categories.go -destination=internal/usecase/mocks/mock_get_categories_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_popular_articles.go -destination=internal/usecase/mocks/mock_get_popular_articles_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_latest_articles.go -destination=internal/usecase/mocks/mock_get_latest_articles_usecase.go -package=mocks
+      - ~/go/bin/mockgen -source=internal/usecase/get_articles_by_category.go -destination=internal/usecase/mocks/mock_get_articles_by_category_usecase.go -package=mocks
 
   coverage:
     desc: Run tests and generate coverage report

@@ -29,7 +29,10 @@ func NewGetCategories(
 	}
 }
 
-func (u *getCategories) Exec(ctx context.Context, input GetCategoriesUsecaseInput) (GetCategoriesUsecaseOutput, error) {
+func (u *getCategories) Exec(
+	ctx context.Context,
+	input GetCategoriesUsecaseInput,
+) (GetCategoriesUsecaseOutput, error) {
 	categories, err := u.categoryRepo.GetCategories(ctx)
 	if err != nil {
 		return GetCategoriesUsecaseOutput{}, err
