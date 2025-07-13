@@ -20,10 +20,19 @@ func NewDIContainer(cfg *config.Config) *DIContainer {
 	// UseCase
 	getArticlesUsecase := usecase.NewGetArticles(articleRepo)
 	getArticleByIDUsecase := usecase.NewGetArticleByID(articleRepo)
+	getPopularArticlesUsecase := usecase.NewGetPopularArticles(articleRepo)
+	getLatestArticlesUsecase := usecase.NewGetLatestArticles(articleRepo)
+	getArticlesByCategoryUsecase := usecase.NewGetArticlesByCategory(articleRepo)
 	getCategoriesUsecase := usecase.NewGetCategories(categoryRepo)
 
 	// Handler
-	articleHandler := handlers.NewArticleHandler(getArticlesUsecase, getArticleByIDUsecase)
+	articleHandler := handlers.NewArticleHandler(
+		getArticlesUsecase,
+		getArticleByIDUsecase,
+		getPopularArticlesUsecase,
+		getLatestArticlesUsecase,
+		getArticlesByCategoryUsecase,
+	)
 	categoryHandler := handlers.NewCategoryHandler(getCategoriesUsecase)
 
 	return &DIContainer{

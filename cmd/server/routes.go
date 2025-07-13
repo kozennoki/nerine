@@ -17,5 +17,8 @@ func setupRoutes(e *echo.Echo, di *DIContainer, cfg *config.Config) {
 	api.Use(middleware.APIKeyAuth(cfg.NerineAPIKey))
 	api.GET("/articles", di.ArticleHandler.GetArticles)
 	api.GET("/articles/:id", di.ArticleHandler.GetArticleByID)
+	api.GET("/articles/popular", di.ArticleHandler.GetPopularArticles)
+	api.GET("/articles/latest", di.ArticleHandler.GetLatestArticles)
 	api.GET("/categories", di.CategoryHandler.GetCategories)
+	api.GET("/categories/:slug/articles", di.ArticleHandler.GetArticlesByCategory)
 }
