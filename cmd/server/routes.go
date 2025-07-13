@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/kozennoki/nerine/internal/infrastructure/config"
 	"github.com/kozennoki/nerine/internal/interfaces/middleware"
+	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/labstack/echo/v4"
 )
 

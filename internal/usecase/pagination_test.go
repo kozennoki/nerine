@@ -10,63 +10,63 @@ func TestBuildPagination(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name         string
-		page         int
-		limit        int
-		defaultLimit int
-		maxLimit     int
-		total        int
-		expectedPage int
-		expectedLimit int
-		expectedOffset int
+		name               string
+		page               int
+		limit              int
+		defaultLimit       int
+		maxLimit           int
+		total              int
+		expectedPage       int
+		expectedLimit      int
+		expectedOffset     int
 		expectedTotalPages int
 	}{
 		{
-			name:         "Valid parameters",
-			page:         2,
-			limit:        10,
-			defaultLimit: 10,
-			maxLimit:     100,
-			total:        50,
-			expectedPage: 2,
-			expectedLimit: 10,
-			expectedOffset: 10,
+			name:               "Valid parameters",
+			page:               2,
+			limit:              10,
+			defaultLimit:       10,
+			maxLimit:           100,
+			total:              50,
+			expectedPage:       2,
+			expectedLimit:      10,
+			expectedOffset:     10,
 			expectedTotalPages: 5,
 		},
 		{
-			name:         "Page less than 1",
-			page:         0,
-			limit:        10,
-			defaultLimit: 10,
-			maxLimit:     100,
-			total:        50,
-			expectedPage: 1,
-			expectedLimit: 10,
-			expectedOffset: 0,
+			name:               "Page less than 1",
+			page:               0,
+			limit:              10,
+			defaultLimit:       10,
+			maxLimit:           100,
+			total:              50,
+			expectedPage:       1,
+			expectedLimit:      10,
+			expectedOffset:     0,
 			expectedTotalPages: 5,
 		},
 		{
-			name:         "Limit less than or equal to 0",
-			page:         1,
-			limit:        0,
-			defaultLimit: 10,
-			maxLimit:     100,
-			total:        50,
-			expectedPage: 1,
-			expectedLimit: 10,
-			expectedOffset: 0,
+			name:               "Limit less than or equal to 0",
+			page:               1,
+			limit:              0,
+			defaultLimit:       10,
+			maxLimit:           100,
+			total:              50,
+			expectedPage:       1,
+			expectedLimit:      10,
+			expectedOffset:     0,
 			expectedTotalPages: 5,
 		},
 		{
-			name:         "Limit exceeds maximum",
-			page:         1,
-			limit:        150,
-			defaultLimit: 10,
-			maxLimit:     100,
-			total:        50,
-			expectedPage: 1,
-			expectedLimit: 100,
-			expectedOffset: 0,
+			name:               "Limit exceeds maximum",
+			page:               1,
+			limit:              150,
+			defaultLimit:       10,
+			maxLimit:           100,
+			total:              50,
+			expectedPage:       1,
+			expectedLimit:      100,
+			expectedOffset:     0,
 			expectedTotalPages: 1,
 		},
 	}

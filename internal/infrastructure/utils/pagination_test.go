@@ -10,10 +10,10 @@ func TestConvertPageToOffset(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name   string
-		page   int
-		limit  int
-		want   int
+		name  string
+		page  int
+		limit int
+		want  int
 	}{
 		{
 			name:  "first page",
@@ -50,7 +50,7 @@ func TestConvertPageToOffset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			got := utils.ConvertPageToOffset(tt.page, tt.limit)
 			if got != tt.want {
 				t.Errorf("ConvertPageToOffset() = %v, want %v", got, tt.want)
@@ -103,7 +103,7 @@ func TestCalculateTotalPages(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			got := utils.CalculateTotalPages(tt.total, tt.limit)
 			if got != tt.want {
 				t.Errorf("CalculateTotalPages() = %v, want %v", got, tt.want)
@@ -160,9 +160,9 @@ func TestNewPagination(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			
+
 			got := utils.NewPagination(tt.total, tt.page, tt.limit)
-			
+
 			if got.Total != tt.wantTotal {
 				t.Errorf("NewPagination().Total = %v, want %v", got.Total, tt.wantTotal)
 			}

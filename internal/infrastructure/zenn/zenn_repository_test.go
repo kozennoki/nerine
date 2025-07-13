@@ -22,18 +22,18 @@ func TestZennRepository_GetArticles_Success(t *testing.T) {
 	mockResponse := map[string]interface{}{
 		"articles": []map[string]interface{}{
 			{
-				"id":                123,
-				"post_type":         "Article",
-				"title":             "Test Article",
-				"slug":              "test-article",
-				"comments_count":    5,
-				"liked_count":       10,
-				"bookmarked_count":  3,
+				"id":                 123,
+				"post_type":          "Article",
+				"title":              "Test Article",
+				"slug":               "test-article",
+				"comments_count":     5,
+				"liked_count":        10,
+				"bookmarked_count":   3,
 				"body_letters_count": 1000,
-				"article_type":      "tech",
-				"emoji":             "📝",
-				"published_at":      publishedAt.Format(time.RFC3339),
-				"body_updated_at":   updatedAt.Format(time.RFC3339),
+				"article_type":       "tech",
+				"emoji":              "📝",
+				"published_at":       publishedAt.Format(time.RFC3339),
+				"body_updated_at":    updatedAt.Format(time.RFC3339),
 				"user": map[string]interface{}{
 					"id":               1,
 					"username":         "kozennoki",
@@ -58,12 +58,12 @@ func TestZennRepository_GetArticles_Success(t *testing.T) {
 	defer server.Close()
 
 	repo := zenn.NewZennRepositoryWithBaseURL(server.URL)
-	
+
 	articles, err := repo.GetArticles(context.Background(), 10, 0)
-	
+
 	require.NoError(t, err)
 	require.Len(t, articles, 1)
-	
+
 	article := articles[0]
 	assert.Equal(t, "123", article.ID)
 	assert.Equal(t, "Test Article", article.Title)
@@ -80,10 +80,10 @@ func TestZennRepository_GetArticles_PaginationCalculation(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name           string
-		limit          int
-		offset         int
-		expectedPage   string
+		name         string
+		limit        int
+		offset       int
+		expectedPage string
 	}{
 		{
 			name:         "First page",
@@ -126,7 +126,7 @@ func TestZennRepository_GetArticles_PaginationCalculation(t *testing.T) {
 
 			repo := zenn.NewZennRepositoryWithBaseURL(server.URL)
 			_, err := repo.GetArticles(context.Background(), tc.limit, tc.offset)
-			
+
 			assert.NoError(t, err)
 		})
 	}
@@ -142,9 +142,9 @@ func TestZennRepository_GetArticles_HTTPError(t *testing.T) {
 	defer server.Close()
 
 	repo := zenn.NewZennRepositoryWithBaseURL(server.URL)
-	
+
 	articles, err := repo.GetArticles(context.Background(), 10, 0)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, articles)
 	assert.Contains(t, err.Error(), "zenn API returned status 500")
@@ -160,9 +160,9 @@ func TestZennRepository_GetArticles_InvalidJSON(t *testing.T) {
 	defer server.Close()
 
 	repo := zenn.NewZennRepositoryWithBaseURL(server.URL)
-	
+
 	articles, err := repo.GetArticles(context.Background(), 10, 0)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, articles)
 	assert.Contains(t, err.Error(), "failed to decode Zenn response")
@@ -178,12 +178,12 @@ func TestZennRepository_GetArticles_ContextCancellation(t *testing.T) {
 	defer server.Close()
 
 	repo := zenn.NewZennRepositoryWithBaseURL(server.URL)
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 	defer cancel()
-	
+
 	articles, err := repo.GetArticles(ctx, 10, 0)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, articles)
 	assert.Contains(t, err.Error(), "failed to fetch articles from Zenn")
@@ -193,10 +193,10 @@ func TestZennRepository_GetArticles_ZeroLimit(t *testing.T) {
 	t.Parallel()
 
 	repo := zenn.NewZennRepositoryWithBaseURL("http://example.com")
-	
+
 	// This should handle the zero limit case
 	articles, err := repo.GetArticles(context.Background(), 0, 0)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, articles)
 	assert.Contains(t, err.Error(), "limit must be greater than 0")
@@ -207,9 +207,9 @@ func TestZennRepository_GetArticles_InvalidURL(t *testing.T) {
 
 	// Use an invalid URL that would cause http.NewRequestWithContext to fail
 	repo := zenn.NewZennRepositoryWithBaseURL("ht\ttp://invalid-url")
-	
+
 	articles, err := repo.GetArticles(context.Background(), 10, 0)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, articles)
 	assert.Contains(t, err.Error(), "failed to create request")

@@ -38,9 +38,9 @@ func NewPagination(total, page, limit int) Pagination {
 	if limit <= 0 {
 		limit = 10
 	}
-	
+
 	totalPages := CalculateTotalPages(total, limit)
-	
+
 	return Pagination{
 		Total:      total,
 		Page:       page,

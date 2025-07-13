@@ -2,8 +2,8 @@ package presenter
 
 import (
 	"github.com/kozennoki/nerine/internal/domain/entity"
-	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/kozennoki/nerine/internal/infrastructure/utils"
+	"github.com/kozennoki/nerine/internal/openapi"
 )
 
 func ConvertArticle(article *entity.Article) openapi.Article {
@@ -47,7 +47,7 @@ func ConvertPagination(pagination utils.Pagination) *openapi.Pagination {
 	page := pagination.Page
 	limit := pagination.Limit
 	totalPages := pagination.TotalPages
-	
+
 	return &openapi.Pagination{
 		Total:      &total,
 		Page:       &page,

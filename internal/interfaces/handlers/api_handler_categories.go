@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/kozennoki/nerine/internal/interfaces/presenter"
+	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/kozennoki/nerine/internal/usecase"
 	"github.com/labstack/echo/v4"
 )

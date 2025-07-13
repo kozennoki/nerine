@@ -34,9 +34,9 @@ func TestConvertArticle(t *testing.T) {
 	result := presenter.ConvertArticle(article)
 
 	expected := openapi.Article{
-		ID:          "test-id",
-		Title:       "Test Title",
-		Image:       "https://example.com/image.jpg",
+		ID:    "test-id",
+		Title: "Test Title",
+		Image: "https://example.com/image.jpg",
 		Category: openapi.Category{
 			Slug: "tech",
 			Name: "Technology",
