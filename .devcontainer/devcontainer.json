@@ -10,6 +10,7 @@
       ]
     }
   },
+  "forwardPorts": [8080],
   "runArgs": [
     "--name=nerine",
     "--network=dev-kozennoki"
