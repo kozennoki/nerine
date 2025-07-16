@@ -5,9 +5,13 @@ import (
 	"github.com/kozennoki/nerine/internal/interfaces/middleware"
 	"github.com/kozennoki/nerine/internal/openapi"
 	"github.com/labstack/echo/v4"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func setupRoutes(e *echo.Echo, di *DIContainer, cfg *config.Config) {
+	// CORS middleware
+	e.Use(echomiddleware.CORS())
+
 	// API key authentication middleware for generated routes
 	apiKeyMiddleware := middleware.APIKeyAuth(cfg.NerineAPIKey)
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
