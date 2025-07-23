@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # アプリケーションをビルド
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o nerine cmd/server/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o nerine cmd/server/*.go
 
 # 最終ステージ
 FROM alpine:latest

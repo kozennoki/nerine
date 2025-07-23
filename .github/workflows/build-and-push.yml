@@ -47,7 +47,7 @@ jobs:
         tags: |
           type=ref,event=tag
           type=raw,value=latest
-          type=raw,value=manual-{{date 'YYYYMMDD-HHmmss'}},enable={{github.event_name == 'workflow_dispatch'}}
+          type=raw,value=manual-{{date 'YYYYMMDD-HHmmss'}},enable=${{ github.event_name == 'workflow_dispatch' }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@5cd11c3a4ced054e52742c5fd54dca954e0edd85 # v5.4.0
