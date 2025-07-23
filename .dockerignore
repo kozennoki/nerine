@@ -1,0 +1,41 @@
+# Git関連
+.git
+.gitignore
+.gitmodules
+
+# ドキュメント
+README.md
+docs/
+*.md
+
+# テスト・カバレッジ関連
+coverage/
+*_test.go
+**/*_test.go
+
+# 開発環境
+.env
+.env.local
+.vscode/
+.devcontainer/
+.claude
+
+# ビルド成果物
+*.exe
+*.so
+*.dylib
+nerine
+
+# その他
+.DS_Store
+Thumbs.db
+
+# GitHub Actions
+.github/
+
+# タスクファイル
+Taskfile.yml
+
+# Dockerファイル
+Dockerfile*
+.dockerignore
