@@ -14,5 +14,6 @@
   "runArgs": [
     "--name=nerine",
     "--network=dev-kozennoki"
-  ]
+  ],
+  "postCreateCommand": "task install-tools"
 }
