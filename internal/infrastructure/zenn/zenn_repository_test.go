@@ -65,13 +65,13 @@ func TestZennRepository_GetArticles_Success(t *testing.T) {
 	require.Len(t, articles, 1)
 
 	article := articles[0]
-	assert.Equal(t, "123", article.ID)
-	assert.Equal(t, "Test Article", article.Title)
-	assert.Equal(t, "📝", article.Image)
+	assert.Equal(t, "test-article", article.ID)
+	assert.Equal(t, "📝Test Article", article.Title)
 	assert.Equal(t, "zenn", article.Category.Slug)
 	assert.Equal(t, "Zenn", article.Category.Name)
-	assert.Equal(t, "Zenn記事 - test-article", article.Description)
+	assert.Equal(t, "Zenn記事 - 123", article.Description)
 	assert.Equal(t, "", article.Body)
+	assert.Equal(t, publishedAt.UTC(), article.PublishedAt)
 	assert.Equal(t, publishedAt.UTC(), article.CreatedAt)
 	assert.Equal(t, updatedAt.UTC(), article.UpdatedAt)
 }

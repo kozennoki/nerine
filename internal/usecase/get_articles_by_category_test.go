@@ -36,12 +36,12 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					{
 						ID:          "1",
 						Title:       "Tech Article 1",
-						Image:       "https://example.com/image1.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description 1",
 						Body:        "Body 1",
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
+						PublishedAt: time.Now(),
 					},
 				}
 				m.EXPECT().CountArticlesByCategory(gomock.Any(), "technology").Return(1, nil)
@@ -65,12 +65,12 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Tech Article",
-						Image:       "https://example.com/image.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
+						PublishedAt: time.Now(),
 					}
 				}
 				m.EXPECT().CountArticlesByCategory(gomock.Any(), "technology").Return(15, nil)
@@ -94,12 +94,12 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Tech Article",
-						Image:       "https://example.com/image.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
+						PublishedAt: time.Now(),
 					}
 				}
 				m.EXPECT().CountArticlesByCategory(gomock.Any(), "technology").Return(200, nil)

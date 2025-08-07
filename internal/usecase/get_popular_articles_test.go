@@ -33,10 +33,10 @@ func TestGetPopularArticles_Exec(t *testing.T) {
 					{
 						ID:          "1",
 						Title:       "Popular Article 1",
-						Image:       "https://example.com/image1.jpg",
 						Category:    entity.Category{Slug: "tech", Name: "Technology"},
 						Description: "Description 1",
 						Body:        "Body 1",
+						PublishedAt: time.Now(),
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
 					},
@@ -58,10 +58,10 @@ func TestGetPopularArticles_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Popular Article",
-						Image:       "https://example.com/image.jpg",
 						Category:    entity.Category{Slug: "tech", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
+						PublishedAt: time.Now(),
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
 					}
@@ -83,10 +83,10 @@ func TestGetPopularArticles_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Popular Article",
-						Image:       "https://example.com/image.jpg",
 						Category:    entity.Category{Slug: "tech", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
+						PublishedAt: time.Now(),
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
 					}

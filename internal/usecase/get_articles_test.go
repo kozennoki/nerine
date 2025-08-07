@@ -34,10 +34,10 @@ func TestGetArticles_Exec(t *testing.T) {
 					{
 						ID:          "1",
 						Title:       "テスト記事1",
-						Image:       "https://example.com/image1.jpg",
 						Category:    entity.Category{Slug: "tech", Name: "技術"},
 						Description: "テスト記事1の説明",
 						Body:        "テスト記事1の本文",
+						PublishedAt: time.Now(),
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
 					},
@@ -62,10 +62,10 @@ func TestGetArticles_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "テスト記事",
-						Image:       "https://example.com/image.jpg",
 						Category:    entity.Category{Slug: "tech", Name: "技術"},
 						Description: "説明",
 						Body:        "本文",
+						PublishedAt: time.Now(),
 						CreatedAt:   time.Now(),
 						UpdatedAt:   time.Now(),
 					}

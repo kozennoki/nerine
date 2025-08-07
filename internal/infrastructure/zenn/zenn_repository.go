@@ -109,14 +109,14 @@ func (r *zennRepository) GetArticles(ctx context.Context, limit, offset int) ([]
 func convertToEntity(zennArticle zennArticle) *entity.Article {
 	return &entity.Article{
 		ID:    zennArticle.Slug,
-		Title: zennArticle.Title,
-		Image: zennArticle.Emoji,
+		Title: zennArticle.Emoji + zennArticle.Title,
 		Category: entity.Category{
 			Slug: "zenn",
 			Name: "Zenn",
 		},
 		Description: fmt.Sprintf("Zenn記事 - %s", strconv.Itoa(zennArticle.ID)),
 		Body:        "",
+		PublishedAt: zennArticle.PublishedAt.UTC(),
 		CreatedAt:   zennArticle.PublishedAt.UTC(),
 		UpdatedAt:   zennArticle.UpdatedAt.UTC(),
 	}

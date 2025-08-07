@@ -24,18 +24,12 @@ func NewArticleRepository(apiKey, serviceID string) repository.ArticleRepository
 type article struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
-	Image       image     `json:"image"`
 	Category    category  `json:"category"`
 	Description string    `json:"description"`
 	Body        string    `json:"body"`
+	PublishedAt time.Time `json:"publishedAt"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
-}
-
-type image struct {
-	URL    string `json:"url"`
-	Height int    `json:"height"`
-	Width  int    `json:"width"`
 }
 
 type articleListResponse struct {
@@ -63,13 +57,13 @@ func (r *articleRepository) GetArticles(ctx context.Context, limit, offset int) 
 		articles[i] = &entity.Article{
 			ID:    item.ID,
 			Title: item.Title,
-			Image: item.Image.URL,
 			Category: entity.Category{
 				Slug: item.Category.ID,
 				Name: item.Category.Name,
 			},
 			Description: item.Description,
 			Body:        item.Body,
+			PublishedAt: item.PublishedAt,
 			CreatedAt:   item.CreatedAt,
 			UpdatedAt:   item.UpdatedAt,
 		}
@@ -93,13 +87,13 @@ func (r *articleRepository) GetArticleByID(ctx context.Context, id string) (*ent
 	return &entity.Article{
 		ID:    res.ID,
 		Title: res.Title,
-		Image: res.Image.URL,
 		Category: entity.Category{
 			Slug: res.Category.ID,
 			Name: res.Category.Name,
 		},
 		Description: res.Description,
 		Body:        res.Body,
+		PublishedAt: res.PublishedAt,
 		CreatedAt:   res.CreatedAt,
 		UpdatedAt:   res.UpdatedAt,
 	}, nil
@@ -124,13 +118,13 @@ func (r *articleRepository) GetArticlesByCategory(ctx context.Context, categoryS
 		articles[i] = &entity.Article{
 			ID:    item.ID,
 			Title: item.Title,
-			Image: item.Image.URL,
 			Category: entity.Category{
 				Slug: item.Category.ID,
 				Name: item.Category.Name,
 			},
 			Description: item.Description,
 			Body:        item.Body,
+			PublishedAt: item.PublishedAt,
 			CreatedAt:   item.CreatedAt,
 			UpdatedAt:   item.UpdatedAt,
 		}
@@ -162,13 +156,13 @@ func (r *articleRepository) GetLatestArticles(ctx context.Context, limit int) ([
 		articles[i] = &entity.Article{
 			ID:    item.ID,
 			Title: item.Title,
-			Image: item.Image.URL,
 			Category: entity.Category{
 				Slug: item.Category.ID,
 				Name: item.Category.Name,
 			},
 			Description: item.Description,
 			Body:        item.Body,
+			PublishedAt: item.PublishedAt,
 			CreatedAt:   item.CreatedAt,
 			UpdatedAt:   item.UpdatedAt,
 		}

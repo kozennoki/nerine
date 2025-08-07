@@ -28,8 +28,7 @@ func TestAPIHandler_GetZennArticles_Success(t *testing.T) {
 	expectedArticles := []*entity.Article{
 		{
 			ID:    "123",
-			Title: "Test Zenn Article",
-			Image: "📝",
+			Title: "📝Test Zenn Article",
 			Category: entity.Category{
 				Slug: "zenn",
 				Name: "Zenn",
@@ -70,8 +69,7 @@ func TestAPIHandler_GetZennArticles_Success(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.Contains(t, rec.Body.String(), "Test Zenn Article")
-	assert.Contains(t, rec.Body.String(), "📝")
+	assert.Contains(t, rec.Body.String(), "📝Test Zenn Article")
 	assert.Contains(t, rec.Body.String(), "zenn")
 }
 
@@ -249,8 +247,7 @@ func TestAPIHandler_GetZennArticles_MultipleArticles(t *testing.T) {
 	expectedArticles := []*entity.Article{
 		{
 			ID:    "123",
-			Title: "First Article",
-			Image: "📝",
+			Title: "📝First Article",
 			Category: entity.Category{
 				Slug: "zenn",
 				Name: "Zenn",
@@ -262,8 +259,7 @@ func TestAPIHandler_GetZennArticles_MultipleArticles(t *testing.T) {
 		},
 		{
 			ID:    "456",
-			Title: "Second Article",
-			Image: "🚀",
+			Title: "🚀Second Article",
 			Category: entity.Category{
 				Slug: "zenn",
 				Name: "Zenn",

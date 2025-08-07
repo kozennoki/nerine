@@ -14,19 +14,20 @@ import (
 func TestConvertArticle(t *testing.T) {
 	t.Parallel()
 
+	publishedAt := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	createdAt := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	updatedAt := time.Date(2023, 1, 2, 0, 0, 0, 0, time.UTC)
 
 	article := &entity.Article{
 		ID:    "test-id",
 		Title: "Test Title",
-		Image: "https://example.com/image.jpg",
 		Category: entity.Category{
 			Slug: "tech",
 			Name: "Technology",
 		},
 		Description: "Test Description",
 		Body:        "Test Body",
+		PublishedAt: publishedAt,
 		CreatedAt:   createdAt,
 		UpdatedAt:   updatedAt,
 	}
@@ -36,13 +37,13 @@ func TestConvertArticle(t *testing.T) {
 	expected := openapi.Article{
 		ID:    "test-id",
 		Title: "Test Title",
-		Image: "https://example.com/image.jpg",
 		Category: openapi.Category{
 			Slug: "tech",
 			Name: "Technology",
 		},
 		Description: "Test Description",
 		Body:        "Test Body",
+		PublishedAt: publishedAt,
 		CreatedAt:   createdAt,
 		UpdatedAt:   updatedAt,
 	}
@@ -55,6 +56,7 @@ func TestConvertArticle(t *testing.T) {
 func TestConvertArticles(t *testing.T) {
 	t.Parallel()
 
+	publishedAt := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	createdAt := time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	updatedAt := time.Date(2023, 1, 2, 0, 0, 0, 0, time.UTC)
 
@@ -62,26 +64,26 @@ func TestConvertArticles(t *testing.T) {
 		{
 			ID:    "test-id-1",
 			Title: "Test Title 1",
-			Image: "https://example.com/image1.jpg",
 			Category: entity.Category{
 				Slug: "tech",
 				Name: "Technology",
 			},
 			Description: "Test Description 1",
 			Body:        "Test Body 1",
+			PublishedAt: publishedAt,
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
 		},
 		{
 			ID:    "test-id-2",
 			Title: "Test Title 2",
-			Image: "https://example.com/image2.jpg",
 			Category: entity.Category{
 				Slug: "design",
 				Name: "Design",
 			},
 			Description: "Test Description 2",
 			Body:        "Test Body 2",
+			PublishedAt: publishedAt,
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
 		},

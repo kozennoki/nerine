@@ -26,8 +26,7 @@ func TestGetZennArticles_Exec_Success(t *testing.T) {
 	expectedArticles := []*entity.Article{
 		{
 			ID:    "123",
-			Title: "Test Zenn Article",
-			Image: "📝",
+			Title: "📝Test Zenn Article",
 			Category: entity.Category{
 				Slug: "zenn",
 				Name: "Zenn",
@@ -36,6 +35,7 @@ func TestGetZennArticles_Exec_Success(t *testing.T) {
 			Body:        "",
 			CreatedAt:   time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 			UpdatedAt:   time.Date(2023, 1, 2, 0, 0, 0, 0, time.UTC),
+			PublishedAt: time.Now(),
 		},
 	}
 

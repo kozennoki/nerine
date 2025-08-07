@@ -35,12 +35,12 @@ func TestGetArticleByID_Exec(t *testing.T) {
 				article := &entity.Article{
 					ID:          "test-article-1",
 					Title:       "テスト記事1",
-					Image:       "https://example.com/image1.jpg",
 					Category:    entity.Category{Slug: "tech", Name: "技術"},
 					Description: "テスト記事1の説明",
 					Body:        "テスト記事1の本文",
 					CreatedAt:   time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 					UpdatedAt:   time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+					PublishedAt: time.Now(),
 				}
 				mockRepo.EXPECT().GetArticleByID(gomock.Any(), "test-article-1").Return(article, nil)
 			},
@@ -48,12 +48,12 @@ func TestGetArticleByID_Exec(t *testing.T) {
 				Article: &entity.Article{
 					ID:          "test-article-1",
 					Title:       "テスト記事1",
-					Image:       "https://example.com/image1.jpg",
 					Category:    entity.Category{Slug: "tech", Name: "技術"},
 					Description: "テスト記事1の説明",
 					Body:        "テスト記事1の本文",
 					CreatedAt:   time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
 					UpdatedAt:   time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC),
+					PublishedAt: time.Now(),
 				},
 			},
 			expectedError: nil,
@@ -120,9 +120,6 @@ func TestGetArticleByID_Exec(t *testing.T) {
 			}
 			if result.Article.Title != expected.Title {
 				t.Errorf("記事タイトルが一致しません。expected: %s, got: %s", expected.Title, result.Article.Title)
-			}
-			if result.Article.Image != expected.Image {
-				t.Errorf("記事画像が一致しません。expected: %s, got: %s", expected.Image, result.Article.Image)
 			}
 			if result.Article.Category.Slug != expected.Category.Slug {
 				t.Errorf("カテゴリSlugが一致しません。expected: %s, got: %s", expected.Category.Slug, result.Article.Category.Slug)
