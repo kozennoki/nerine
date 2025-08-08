@@ -52,6 +52,7 @@ func (r *articleRepository) GetArticles(ctx context.Context, limit, offset int) 
 		Endpoint: "blog",
 		Limit:    limit,
 		Offset:   offset,
+		Orders:   []string{"-publishedAt"},
 	}
 
 	err := r.microCMS.List(params, &res)
