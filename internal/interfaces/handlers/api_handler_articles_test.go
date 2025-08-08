@@ -39,7 +39,7 @@ func TestAPIHandler_GetArticles(t *testing.T) {
 			expectedInput: usecase.GetArticlesUsecaseInput{Page: 1, Limit: 10},
 			mockOutput: usecase.GetArticlesUsecaseOutput{
 				Articles: []*entity.Article{
-					{ID: "1", Title: "Test Article", Category: entity.Category{Slug: "tech", Name: "Technology"}},
+					{ID: "1", Title: "Test Article", Image: "test.jpg", Category: entity.Category{Slug: "tech", Name: "Technology"}},
 				},
 				Pagination: utils.Pagination{Total: 1, Page: 1, Limit: 10, TotalPages: 1},
 			},

@@ -21,6 +21,7 @@ func TestConvertArticle(t *testing.T) {
 	article := &entity.Article{
 		ID:    "test-id",
 		Title: "Test Title",
+		Image: "example.png",
 		Category: entity.Category{
 			Slug: "tech",
 			Name: "Technology",
@@ -37,6 +38,7 @@ func TestConvertArticle(t *testing.T) {
 	expected := openapi.Article{
 		ID:    "test-id",
 		Title: "Test Title",
+		Image: "example.png",
 		Category: openapi.Category{
 			Slug: "tech",
 			Name: "Technology",
@@ -64,6 +66,7 @@ func TestConvertArticles(t *testing.T) {
 		{
 			ID:    "test-id-1",
 			Title: "Test Title 1",
+			Image: "example.png",
 			Category: entity.Category{
 				Slug: "tech",
 				Name: "Technology",
@@ -77,6 +80,7 @@ func TestConvertArticles(t *testing.T) {
 		{
 			ID:    "test-id-2",
 			Title: "Test Title 2",
+			Image: "example.png",
 			Category: entity.Category{
 				Slug: "design",
 				Name: "Design",

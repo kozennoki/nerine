@@ -27,6 +27,7 @@ func TestGetZennArticles_Exec_Success(t *testing.T) {
 		{
 			ID:    "123",
 			Title: "📝Test Zenn Article",
+			Image: "https://example.com/zenn-article.jpg",
 			Category: entity.Category{
 				Slug: "zenn",
 				Name: "Zenn",

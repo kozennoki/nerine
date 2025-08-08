@@ -10,6 +10,7 @@ func ConvertArticle(article *entity.Article) openapi.Article {
 	return openapi.Article{
 		ID:          article.ID,
 		Title:       article.Title,
+		Image:       article.Image,
 		Category:    ConvertCategory(article.Category),
 		Description: article.Description,
 		Body:        article.Body,

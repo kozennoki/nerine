@@ -36,6 +36,7 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					{
 						ID:          "1",
 						Title:       "Tech Article 1",
+						Image:       "https://example.com/tech1.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description 1",
 						Body:        "Body 1",
@@ -65,6 +66,7 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Tech Article",
+						Image:       "https://example.com/tech-article.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
@@ -94,6 +96,7 @@ func TestGetArticlesByCategory_Exec(t *testing.T) {
 					articles[i] = &entity.Article{
 						ID:          string(rune('1' + i)),
 						Title:       "Tech Article",
+						Image:       "https://example.com/tech-article.jpg",
 						Category:    entity.Category{Slug: "technology", Name: "Technology"},
 						Description: "Description",
 						Body:        "Body",
