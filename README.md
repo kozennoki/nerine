@@ -1,18 +1,15 @@
-# Nerine - Blog BFF API
+# Nerine
 
-Next.js + microCMS ブログシステム用のBFF（Backend for Frontend）API
+NerineはmicroCMS、Zennから記事を取得しフロントエンド向けにAPIを提供するBFFです。
 
 ## 概要
 
-microCMSをデータソースとして、Next.jsフロントエンドに最適化されたAPIを提供するGoアプリケーション
+Goで作成されているBFFリポジトリです。[Hibiscus](https://github.com/kozennoki/api-schema)のスキーマ定義に準拠していれば、フロントエンドは自由に実装することができます。
 
-## アーキテクチャ
-
-- **DDD + クリーンアーキテクチャ**
-- **HTTPフレームワーク**: Echo
-- **ログ**: zap（構造化ログ）
-- **設定**: 環境変数（os.Getenv）
-- **デプロイ**: AWS Lambda（将来対応）
+**特徴:**
+  - **DDD + クリーンアーキテクチャ:** Entity, UseCase, Interface, Infrastructureの4層構造で、ビジネスロジックを外部依存から分離
+  - **APIキー認証:** HeaderにてX-API-Keyによるシンプルな認証を実装
+  - **microCMS, Zenn連携:** コンテンツのデータをmicroCMS, Zennで管理し、DBの運用負荷を削減
 
 ## API エンドポイント
 
@@ -107,21 +104,6 @@ NERINE_API_KEY=your_nerine_api_key
 PORT=8080
 ```
 
-## 開発開始
+## 関連レポジトリ
 
-```bash
-# Go モジュール初期化
-go mod init github.com/your-username/nerine
-
-# 依存関係インストール
-go mod tidy
-
-# サーバー起動
-go run cmd/server/main.go
-```
-
-## 依存関係
-
-- Echo: HTTPフレームワーク
-- microCMS Go SDK: CMS API クライアント
-- zap: 構造化ログ
+- [Hibiscus](https://github.com/kozennoki/api-schema) - OpenAPI スキーマ定義
