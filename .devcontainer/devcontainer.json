@@ -1,8 +1,6 @@
 {
   "name": "nerine",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -15,5 +13,5 @@
     "--name=nerine",
     "--network=dev-kozennoki"
   ],
-  "postCreateCommand": "task install-tools"
+  "postCreateCommand": "bash setup.sh"
 }
