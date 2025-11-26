@@ -23,11 +23,11 @@ type GetZennArticlesUsecaseOutput struct {
 }
 
 type getZennArticles struct {
-	zennRepo repository.ArticleRepository
+	zennRepo repository.ArticleReader
 }
 
 func NewGetZennArticles(
-	zennRepo repository.ArticleRepository,
+	zennRepo repository.ArticleReader,
 ) GetZennArticlesUsecase {
 	return &getZennArticles{
 		zennRepo: zennRepo,
