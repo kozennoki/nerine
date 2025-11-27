@@ -22,7 +22,7 @@ type zennRepository struct {
 	baseURL    string
 }
 
-func NewZennRepository() repository.ArticleRepository {
+func NewZennRepository() repository.ArticleReader {
 	return &zennRepository{
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
@@ -31,7 +31,7 @@ func NewZennRepository() repository.ArticleRepository {
 	}
 }
 
-func NewZennRepositoryWithBaseURL(baseURL string) repository.ArticleRepository {
+func NewZennRepositoryWithBaseURL(baseURL string) repository.ArticleReader {
 	return &zennRepository{
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
@@ -120,28 +120,4 @@ func convertToEntity(zennArticle zennArticle) *entity.Article {
 		CreatedAt:   zennArticle.PublishedAt.UTC(),
 		UpdatedAt:   zennArticle.UpdatedAt.UTC(),
 	}
-}
-
-func (r *zennRepository) GetArticleByID(ctx context.Context, id string) (*entity.Article, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (r *zennRepository) GetArticlesByCategory(ctx context.Context, categorySlug string, limit, offset int) ([]*entity.Article, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (r *zennRepository) GetPopularArticles(ctx context.Context, limit int) ([]*entity.Article, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (r *zennRepository) GetLatestArticles(ctx context.Context, limit int) ([]*entity.Article, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (r *zennRepository) CountArticles(ctx context.Context) (int, error) {
-	return 0, fmt.Errorf("not implemented")
-}
-
-func (r *zennRepository) CountArticlesByCategory(ctx context.Context, categorySlug string) (int, error) {
-	return 0, fmt.Errorf("not implemented")
 }
